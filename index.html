@@ -483,7 +483,7 @@ it:{
 'game.inviteBtn':'⚲ Invita','overlay.inviteTitle':'Invita un altro giocatore',
 'overlay.inviteHint':'Se qualcuno si è disconnesso, può rientrare con questo codice e questa password, anche a partita in corso.',
 'misc.close':'Chiudi','lobby.leaveBtn':'Lascia la stanza',
-'opt.customwild':'Includi la Carta Bianca (personalizzabile)','card.custom':'Carta Bianca',
+'opt.customwild':'Includi le Carte Bianche (2 a scelta + 2 Rimescola)','card.custom':'Carta Bianca','card.shuffle':'Carta Rimescola',
 'overlay.customTitle':'Scegli l\'effetto','overlay.chooseTarget':'Scegli il giocatore',
 'custom.drawN':'Un giocatore pesca N carte','custom.drawUntilColor':'Un giocatore pesca finché non esce un colore',
 'custom.swapHands':'Scambia la mano con un giocatore','custom.rotateHands':'Ruota tutte le mani',
@@ -561,7 +561,7 @@ en:{
 'game.inviteBtn':'⚲ Invite','overlay.inviteTitle':'Invite another player',
 'overlay.inviteHint':'If someone got disconnected, they can rejoin with this code and password, even mid-game.',
 'misc.close':'Close','lobby.leaveBtn':'Leave room',
-'opt.customwild':'Include the Wild Card (customizable)','card.custom':'Wild Card',
+'opt.customwild':'Include the Wild Cards (2 pick-an-effect + 2 Shuffle)','card.custom':'Wild Card','card.shuffle':'Shuffle Card',
 'overlay.customTitle':'Choose the effect','overlay.chooseTarget':'Choose the player',
 'custom.drawN':'A player draws N cards','custom.drawUntilColor':'A player draws until a color comes up',
 'custom.swapHands':'Swap hands with a player','custom.rotateHands':'Rotate all hands',
@@ -639,7 +639,7 @@ es:{
 'game.inviteBtn':'⚲ Invitar','overlay.inviteTitle':'Invita a otro jugador',
 'overlay.inviteHint':'Si alguien se ha desconectado, puede volver a entrar con este código y esta contraseña, incluso con la partida en curso.',
 'misc.close':'Cerrar','lobby.leaveBtn':'Salir de la sala',
-'opt.customwild':'Incluir la Carta Blanca (personalizable)','card.custom':'Carta Blanca',
+'opt.customwild':'Incluir las Cartas Blancas (2 a elegir + 2 Barajar)','card.custom':'Carta Blanca','card.shuffle':'Carta Barajar',
 'overlay.customTitle':'Elige el efecto','overlay.chooseTarget':'Elige el jugador',
 'custom.drawN':'Un jugador roba N cartas','custom.drawUntilColor':'Un jugador roba hasta que sale un color',
 'custom.swapHands':'Intercambia la mano con un jugador','custom.rotateHands':'Rota todas las manos',
@@ -717,7 +717,7 @@ fr:{
 'game.inviteBtn':'⚲ Inviter','overlay.inviteTitle':'Invite un autre joueur',
 'overlay.inviteHint':'Si quelqu\'un a été déconnecté, il peut revenir avec ce code et ce mot de passe, même en pleine partie.',
 'misc.close':'Fermer','lobby.leaveBtn':'Quitter la salle',
-'opt.customwild':'Inclure la Carte Blanche (personnalisable)','card.custom':'Carte Blanche',
+'opt.customwild':'Inclure les Cartes Blanches (2 au choix + 2 Mélange)','card.custom':'Carte Blanche','card.shuffle':'Carte Mélange',
 'overlay.customTitle':'Choisis l\'effet','overlay.chooseTarget':'Choisis le joueur',
 'custom.drawN':'Un joueur pioche N cartes','custom.drawUntilColor':'Un joueur pioche jusqu\'à une couleur',
 'custom.swapHands':'Échange sa main avec un joueur','custom.rotateHands':'Fait tourner toutes les mains',
@@ -795,7 +795,7 @@ de:{
 'game.inviteBtn':'⚲ Einladen','overlay.inviteTitle':'Weiteren Spieler einladen',
 'overlay.inviteHint':'Falls jemand die Verbindung verloren hat, kann er mit diesem Code und Passwort wieder einsteigen, auch mitten im Spiel.',
 'misc.close':'Schließen','lobby.leaveBtn':'Raum verlassen',
-'opt.customwild':'Weiße Karte einschließen (anpassbar)','card.custom':'Weiße Karte',
+'opt.customwild':'Weiße Karten einschließen (2 mit Effektwahl + 2 Mischen)','card.custom':'Weiße Karte','card.shuffle':'Misch-Karte',
 'overlay.customTitle':'Effekt wählen','overlay.chooseTarget':'Spieler wählen',
 'custom.drawN':'Ein Spieler zieht N Karten','custom.drawUntilColor':'Ein Spieler zieht, bis eine Farbe kommt',
 'custom.swapHands':'Tauscht die Hand mit einem Spieler','custom.rotateHands':'Dreht alle Hände weiter',
@@ -873,7 +873,7 @@ pt:{
 'game.inviteBtn':'⚲ Convidar','overlay.inviteTitle':'Convida outro jogador',
 'overlay.inviteHint':'Se alguém ficou desconectado, pode voltar a entrar com este código e senha, mesmo a meio do jogo.',
 'misc.close':'Fechar','lobby.leaveBtn':'Sair da sala',
-'opt.customwild':'Incluir a Carta Branca (personalizável)','card.custom':'Carta Branca',
+'opt.customwild':'Incluir as Cartas Brancas (2 à escolha + 2 Baralhar)','card.custom':'Carta Branca','card.shuffle':'Carta Baralhar',
 'overlay.customTitle':'Escolhe o efeito','overlay.chooseTarget':'Escolhe o jogador',
 'custom.drawN':'Um jogador compra N cartas','custom.drawUntilColor':'Um jogador compra até sair uma cor',
 'custom.swapHands':'Troca a mão com um jogador','custom.rotateHands':'Roda todas as mãos',
@@ -904,7 +904,10 @@ function kindName(v){ return v==='skip'?t('card.skip'):v==='rev'?t('card.reverse
 function cardFullName(card){
   if(!card) return '';
   if(card.c!=='w') return colorName(card.c)+' '+kindName(card.v);
-  return card.v==='+4'?t('card.drawfour'):card.v==='custom'?t('card.custom'):t('card.wild');
+  if(card.v==='+4') return t('card.drawfour');
+  if(card.v==='custom') return t('card.custom');
+  if(card.v==='shuffle') return t('card.shuffle');
+  return t('card.wild');
 }
 // i log e gli errori di rete arrivano come {k,p} grezzi: si traducono qui,
 // sul dispositivo di chi guarda, non su quello che li ha generati
@@ -1337,7 +1340,7 @@ class Net{
           + 4 cambia colore + 4 pesca quattro           = 108
    Punti : numeri = valore, azioni = 20, jolly = 50. Si arriva a 500.       */
 const COLORS=['r','g','b','y'];
-const LBL={skip:'⊘',rev:'⇄','+2':'+2',wild:'★','+4':'+4',custom:'⇌'};
+const LBL={skip:'⊘',rev:'⇄','+2':'+2',wild:'★','+4':'+4',custom:'⇌',shuffle:'⇅'};
 // un simbolo per colore, non solo la tinta: chi non distingue rosso e verde
 // (la forma più comune di daltonismo) legge comunque la carta
 const CSHAPE={r:'●',g:'■',b:'◆',y:'▲'};
@@ -1351,9 +1354,13 @@ function buildDeck(opts){
     for(const v of ['skip','rev','+2']){ d.push({c,v}); d.push({c,v}); }
   }
   for(let i=0;i<4;i++){ d.push({c:'w',v:'wild'}); d.push({c:'w',v:'+4'}); }
-  // la carta bianca personalizzabile dei mazzi ufficiali recenti: qui è
-  // una sola, con un menu di effetti al posto della penna per scriverci sopra
-  if(opts.customWild) d.push({c:'w',v:'custom'});
+  // due carte bianche personalizzabili (menu di effetti al posto della penna
+  // per scriverci sopra) + due carte Rimescola dedicate, che l'effetto non
+  // lo scelgono: mescolano e ridistribuiscono le mani e basta
+  if(opts.customWild){
+    d.push({c:'w',v:'custom'}); d.push({c:'w',v:'custom'});
+    d.push({c:'w',v:'shuffle'}); d.push({c:'w',v:'shuffle'});
+  }
   return shuffle(d);
 }
 function shuffle(a){
@@ -1397,7 +1404,7 @@ class Game{
                           : {k:'err.notPlayable'};
     if(this.stack===0&&c.v==='+4'&&this.strict4&&p.hand.some(x=>x.c===this.color))
       return {k:'err.stillHaveColor',p:{color:this.color}};
-    if(this.stack===0&&(c.v==='wild'||c.v==='custom')&&this.strictW&&
+    if(this.stack===0&&(c.v==='wild'||c.v==='custom'||c.v==='shuffle')&&this.strictW&&
        p.hand.some(x=>x.c!=='w'&&playable(x,this.top(),this.color)))
       return {k:'err.haveOtherPlayable'};
     return null;
@@ -1497,14 +1504,20 @@ class Game{
     p.hand.splice(idx,1);
     this.pending=null;
     this.discard.push(card);
-    this.color = card.c==='w' ? (COLORS.includes(chosen)?chosen:'r') : card.c;
-    if(card.c==='w') this.say('log.playWild',{name:p.name,card,color:this.color});
+    // Rimescola non tocca il colore in gioco: non è una scelta che le
+    // compete, e chiederla comunque sarebbe un passaggio a vuoto. Per le
+    // altre "w" senza una scelta valida si resta sul colore di prima
+    // (invece di forzare il rosso, che non aveva alcun senso).
+    if(card.v!=='shuffle')
+      this.color = card.c==='w' ? (COLORS.includes(chosen)?chosen:this.color) : card.c;
+    if(card.c==='w'&&card.v!=='shuffle') this.say('log.playWild',{name:p.name,card,color:this.color});
     else this.say('log.play',{name:p.name,card});
 
     // l'effetto scelto per la carta bianca si applica prima di controllare
     // se la mano è finita: può cambiarla (scambio, ridistribuzione), e la
     // vittoria deve guardare la mano DOPO l'effetto, non prima.
     if(card.v==='custom') this.applyCustomEffect(p,custom);
+    else if(card.v==='shuffle') this.applyCustomEffect(p,{effect:'reshuffleAll'});
 
     if(p.hand.length===0){ this.endRound(p); return null; }
     if(p.hand.length!==1) p.said=false;
@@ -2156,7 +2169,7 @@ function canPlay(c,i){
   if(!legal(c,VIEW.top,VIEW.color,VIEW.stack,VIEW.stackType)) return false;
   if(VIEW.pending!==null&&VIEW.pending!==-1&&VIEW.pending!==i) return false;
   if(VIEW.stack===0&&c.v==='+4'&&VIEW.strict4&&VIEW.hand.some(x=>x.c===VIEW.color)) return false;
-  if(VIEW.stack===0&&c.v==='wild'&&VIEW.strictW&&
+  if(VIEW.stack===0&&(c.v==='wild'||c.v==='custom'||c.v==='shuffle')&&VIEW.strictW&&
      VIEW.hand.some(x=>x.c!=='w'&&playable(x,VIEW.top,VIEW.color))) return false;
   return true;
 }
@@ -2197,7 +2210,7 @@ function renderHand(mine){
       if(handView==='fan'&&selIdx!==i){ selIdx=i; renderHand(mine); return; }
       if(!allowed){ selIdx=null; renderHand(mine); return; }
       selIdx=null;
-      c.c!=='w' ? act({t:'play',i}) : (c.v==='custom' ? pickCustomEffect(i) : pickColor(i));
+      c.c!=='w' || c.v==='shuffle' ? act({t:'play',i}) : (c.v==='custom' ? pickCustomEffect(i) : pickColor(i));
     };
   });
 
