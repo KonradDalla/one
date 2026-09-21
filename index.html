@@ -118,6 +118,8 @@ input[type=text]:focus{border-color:var(--y)}
 .card .big{font-size:29px;text-shadow:0 2px 0 #0003}
 .card .cnr{position:absolute;font-size:11px;opacity:.92}
 .card .cnr.tl{top:3px;left:5px} .card .cnr.br{bottom:3px;right:5px;transform:rotate(180deg)}
+.card .cshape{position:absolute;top:4px;right:6px;font-size:10px;opacity:.85;text-shadow:0 1px 0 #0004}
+.hand.griglia .card .cshape{display:none}
 .card.r{background:var(--r)} .card.g{background:var(--g)}
 .card.b{background:var(--b)} .card.y{background:var(--y);color:#3b2f00}
 .card.w{background:conic-gradient(var(--r) 0 25%,var(--b) 0 50%,var(--y) 0 75%,var(--g) 0)}
@@ -126,7 +128,8 @@ input[type=text]:focus{border-color:var(--y)}
 .deckwrap{position:relative;cursor:pointer}
 .deckwrap .n{position:absolute;bottom:-17px;width:100%;text-align:center;font-size:11px;color:var(--dim)}
 .colorbar{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--dim)}
-.swatch{width:15px;height:15px;border-radius:5px;border:2px solid #fff6}
+.swatch{width:17px;height:17px;border-radius:5px;border:2px solid #fff6;
+  display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;line-height:1}
 .log{font-size:12px;color:var(--dim);height:16px;text-align:center;padding:0 16px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
 .dirn{font-size:12px;color:var(--dim)}
@@ -166,18 +169,21 @@ input[type=text]:focus{border-color:var(--y)}
   transform-origin:50% 115%;transition:transform .2s cubic-bezier(.2,.8,.3,1),box-shadow .2s;
   box-shadow:-3px 4px 10px #0006}
 .hand.fan .card.sel{box-shadow:0 10px 26px #000a;z-index:99!important}
-.hand.fan .card.ok::after{content:"";position:absolute;inset:-3px;border-radius:10px;
-  box-shadow:0 0 0 2px var(--y);pointer-events:none}
+/* anello + bagliore ben visibili sopra qualunque sfondo di carta: prima era
+   un filo di 2px, quasi invisibile sulle carte gialle e sul feltro scuro.
+   Vale in tutte e tre le viste, non solo nel ventaglio.                    */
+.hand .card.ok::after{content:"";position:absolute;inset:-4px;border-radius:12px;
+  box-shadow:0 0 0 3px #fff,0 0 0 6px var(--y),0 0 18px 4px #e8b91fcc;pointer-events:none}
 
 /* Le non giocabili si smorzano solo dove non rovinano la lettura: nel
    ventaglio le carte si sovrappongono, e sbiadirle fa sembrare la mano rotta.
-   Lì basta l'anello giallo sulle giocabili.                                 */
+   Lì bastano l'anello e il bagliore sulle giocabili.                       */
 .hand.fila .card.no,.hand.griglia .card.no{opacity:.38}
 .hand.fan .card.no{opacity:.85}
 
 /* suggerimenti spenti: nessuna carta viene evidenziata */
 .hand.noaiuti .card.no{opacity:1}
-.hand.fan.noaiuti .card.ok::after{display:none}
+.hand.noaiuti .card.ok::after{display:none}
 .hand.fila.noaiuti .card.ok,.hand.griglia.noaiuti .card.ok{transform:none}
 .mystatus{text-align:center;font-size:13px;font-weight:700;height:18px;color:var(--y)}
 
@@ -188,7 +194,8 @@ input[type=text]:focus{border-color:var(--y)}
   width:100%;max-width:340px;text-align:center;max-height:85vh;overflow:auto}
 .panel h2{margin:0 0 6px;font-size:21px}
 .colorpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-.cp{height:62px;border-radius:14px;border:3px solid #fff3;cursor:pointer}
+.cp{height:62px;border-radius:14px;border:3px solid #fff3;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:26px}
 .scoretab{width:100%;font-size:14px;margin-top:12px;border-collapse:collapse}
 .scoretab td{padding:7px 4px;border-bottom:1px solid #ffffff14;text-align:left}
 .scoretab td:last-child{text-align:right;font-weight:900}
@@ -322,6 +329,14 @@ const stores=()=>{ const o=[]; try{ if(localStorage) o.push(localStorage); }catc
   try{ if(sessionStorage) o.push(sessionStorage); }catch(e){} return o; };
 const keep=(k,v)=>{ for(const s of stores()) try{ s.setItem(k,v); }catch(e){} };
 const recall=k=>{ for(const s of stores()) try{ const v=s.getItem(k); if(v) return v; }catch(e){} return ''; };
+
+/* Identità del dispositivo: sopravvive ai ricaricamenti, a differenza di
+   Net.me che è nuovo a ogni sessione. Senza, un giocatore che ricarica la
+   pagina risulta un estraneo per l'host finché il vecchio posto non scade
+   (fino a 30s): nel frattempo se ne crea uno nuovo, e il vecchio resta un
+   fantasma per sempre. Con l'id di dispositivo l'host riconosce subito
+   "sei tu" e riprende lo stesso posto, anche prima che scada.             */
+const DEVID = recall('uct_dev') || (()=>{ const d=rid(14); keep('uct_dev',d); return d; })();
 
 /* --------------------------------------------------------------------- I18N
    Tutto il testo passa da qui: markup statico via data-i18n[-html|-ph],
@@ -1063,7 +1078,7 @@ class Net{
   // si presenta finché qualcuno (l'host di turno) non risponde con un'offerta
   rehello(){
     clearInterval(this._hb);
-    const hello=()=>this._pub({t:'hello',from:this.me,name:ME.name,pk:this.pk});
+    const hello=()=>this._pub({t:'hello',from:this.me,name:ME.name,pk:this.pk,dev:DEVID});
     hello();
     this._hb=setInterval(()=>{ if(this.links.size) clearInterval(this._hb); else hello(); },2500);
   }
@@ -1089,8 +1104,8 @@ class Net{
   async _sig(m){
     if(!m||m.from===this.me) return;
     if(m.to&&m.to!==this.me) return;
-    if(m.t==='hello'&&this.isHost) return this._offer(m.from,m.name,m.pk);
-    if(m.t==='host'&&!this.isHost) return this._pub({t:'hello',from:this.me,name:ME.name,pk:this.pk});
+    if(m.t==='hello'&&this.isHost) return this._offer(m.from,m.name,m.pk,m.dev);
+    if(m.t==='host'&&!this.isHost) return this._pub({t:'hello',from:this.me,name:ME.name,pk:this.pk,dev:DEVID});
     // un giocatore ha preso in mano la partita: lo decide l'app, non la rete
     if(m.t==='newhost'){ this.onnewhost(m); return; }
     if(m.t==='offer'&&!this.isHost){
@@ -1135,15 +1150,15 @@ class Net{
     dc.onclose=()=>{ l.mode='relay'; this.onstatus(); };
     dc.onmessage=e=>{ try{ this.ondata(l.id,JSON.parse(e.data)); }catch(err){} };
   }
-  async _offer(id,name,pk){
-    if(this.links.has(id)){ this.onpeer(id,name); return; }
+  async _offer(id,name,pk,dev){
+    if(this.links.has(id)){ this.onpeer(id,name,false,dev); return; }
     const l=this._mk(id,pk);
     this._wire(l,l.pc.createDataChannel('g',{ordered:true}));
     try{
       const o=await l.pc.createOffer(); await l.pc.setLocalDescription(o);
       this._pub({t:'offer',from:this.me,to:id,sdp:o,pk:this.pk});
     }catch(e){}
-    this.onpeer(id,name);
+    this.onpeer(id,name,false,dev);
   }
   send(id,obj){
     const l=this.links.get(id); if(!l) return;
@@ -1168,6 +1183,9 @@ class Net{
    Punti : numeri = valore, azioni = 20, jolly = 50. Si arriva a 500.       */
 const COLORS=['r','g','b','y'];
 const LBL={skip:'⊘',rev:'⇄','+2':'+2',wild:'★','+4':'+4'};
+// un simbolo per colore, non solo la tinta: chi non distingue rosso e verde
+// (la forma più comune di daltonismo) legge comunque la carta
+const CSHAPE={r:'●',g:'■',b:'◆',y:'▲'};
 
 function buildDeck(){
   const d=[];
@@ -1224,24 +1242,32 @@ class Game{
       return {k:'err.haveOtherPlayable'};
     return null;
   }
-  add(id,name){
+  add(id,name,dev){
     const same=this.P.find(p=>p.id===id);
     if(same){
       // stesso dispositivo che torna dopo un buco di rete: si riattiva
       if(!same.conn){ same.conn=true; this.say('log.reconnected',{name:same.name}); }
+      if(dev) same.dev=dev;
       return;
     }
     const nm=(name||t('default.anon'));
-    const seat=this.P.find(p=>!p.conn&&p.name===nm);
+    // l'id di dispositivo è la chiave forte per il rientro: sopravvive al
+    // ricaricamento della pagina, quindi riconosce "sei tu" anche se il
+    // vecchio posto non è ancora scaduto (altrimenti si crea un duplicato,
+    // e il vecchio resta un fantasma per sempre). Senza id si ripiega sul
+    // nome, ma solo su un posto già segnato come scollegato.
+    let seat = dev ? this.P.find(p=>p.dev===dev) : null;
+    if(!seat) seat=this.P.find(p=>!p.conn&&p.name===nm);
     if(seat){                       // rientro: si riprende lo stesso posto
-      const old=seat.id; seat.id=id; seat.conn=true;
+      const old=seat.id; seat.id=id; seat.conn=true; seat.name=nm;
+      if(dev) seat.dev=dev;
       if(this.pending&&this.pending.id===old) this.pending.id=id;
       this.say('log.reconnected',{name:nm});
       return;
     }
     if(this.phase!=='lobby') return;   // a partita iniziata non entra nessuno
     if(this.P.length>=10) return;
-    this.P.push({id,name:nm,hand:[],score:0,said:false,conn:true});
+    this.P.push({id,name:nm,hand:[],score:0,said:false,conn:true,dev:dev||null});
   }
   drop(id){ const p=this.P.find(x=>x.id===id); if(p) p.conn=false; }
   // {k,p}: chiave + parametri grezzi, non testo già formattato — si traduce
@@ -1513,7 +1539,7 @@ function hostInit(){
   ME.id=NET.me;
   G=new Game(lobbyRules());
   G.epoch=0;
-  G.add(NET.me,ME.name);
+  G.add(NET.me,ME.name,DEVID);
   becomeHost();
 }
 // imposta il ruolo di host su una partita esistente (nuova o ripresa)
@@ -1522,9 +1548,9 @@ function becomeHost(){
   NET.onnewhost=onNewHost;          // se qualcuno subentra, devo saperlo e farmi da parte
   const now=Date.now();
   for(const p of G.P) lastSeen.set(p.id,now);    // tutti partono col beneficio del dubbio
-  NET.onpeer=(id,name,gone)=>{
+  NET.onpeer=(id,name,gone,dev)=>{
     if(!G||!ME.host) return;          // difesa: mai lavorare su una partita buttata
-    if(gone) G.drop(id); else if(name) G.add(id,name);
+    if(gone) G.drop(id); else if(name) G.add(id,name,dev);
     lastSeen.set(id,Date.now()); pushAll();
   };
   NET.ondata=(from,msg)=>{
@@ -1534,7 +1560,7 @@ function becomeHost(){
     if(who&&!who.conn&&from!==ME.id){ who.conn=true; G.say('log.reconnected',{name:who.name}); }
     if(msg.t==='ping'){ if(who&&!who.conn) pushAll(); return; }
     let err=null;
-    if(msg.t==='join'){ G.add(from,msg.name); pushAll(); return; }
+    if(msg.t==='join'){ G.add(from,msg.name,msg.dev); pushAll(); return; }
     if(msg.t==='play') err=G.play(from,msg.i,msg.color);
     else if(msg.t==='draw') err=G.draw(from);
     else if(msg.t==='pass') err=G.pass(from);
@@ -1746,7 +1772,7 @@ function ensureGuestLoops(){
 function setGuestHandlers(){
   NET.onpeer=(id,name,gone)=>{
     if(gone){ if(VIEW&&id===VIEW.host) hostGone=Date.now(); return; }
-    NET.send(id,{t:'join',name:ME.name});
+    NET.send(id,{t:'join',name:ME.name,dev:DEVID});
   };
   NET.onnewhost=onNewHost;
   NET.ondata=(from,msg)=>{
@@ -1769,8 +1795,9 @@ function act(o){
 function cardEl(c,cls){
   const d=document.createElement('div');
   d.className='card '+c.c+(cls?' '+cls:'');
-  const l=LBL[c.v]||c.v;
-  d.innerHTML='<span class="cnr tl">'+l+'</span><span class="big">'+l+'</span><span class="cnr br">'+l+'</span>';
+  const l=LBL[c.v]||c.v, shape=CSHAPE[c.c];
+  d.innerHTML='<span class="cnr tl">'+l+'</span><span class="big">'+l+'</span><span class="cnr br">'+l+'</span>'+
+    (shape?'<span class="cshape">'+shape+'</span>':'');
   return d;
 }
 function btn(t,fn,cls){ const b=document.createElement('button');
@@ -1860,6 +1887,8 @@ function renderAll(){
   }
   setText('#deckn',tn('game.deckCount',VIEW.deck));
   $('#swatch').style.background='var(--'+VIEW.color+')';
+  $('#swatch').style.color=VIEW.color==='y'?'#3b2f00':'#fff';
+  $('#swatch').textContent=CSHAPE[VIEW.color]||'';
   const dh = VIEW.stack>0
     ? '<span class="stackbadge">'+t('game.stackBadge',{n:VIEW.stack})+'</span>'
     : (VIEW.dir===1?t('game.clockwise'):t('game.counterclockwise'));
@@ -2042,7 +2071,8 @@ function pickColor(i){
   const g=p.querySelector('.colorpick');
   COLORS.forEach(c=>{
     const d=document.createElement('div'); d.className='cp';
-    d.style.background='var(--'+c+')';
+    d.style.background='var(--'+c+')'; d.style.color=c==='y'?'#3b2f00':'#fff';
+    d.textContent=CSHAPE[c];
     d.onclick=()=>{ ov.classList.remove('on'); act({t:'play',i,color:c}); };
     g.appendChild(d);
   });
