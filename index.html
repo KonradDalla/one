@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Uno Contro Tutti</title>
+<title>One</title>
 <style>
 :root{
   --r:#e4443a; --g:#3aa757; --b:#2b7fd4; --y:#e8b91f;
@@ -194,25 +194,29 @@ input[type=text]:focus{border-color:var(--y)}
 .scoretab td:last-child{text-align:right;font-weight:900}
 .net{position:fixed;top:calc(4px + env(safe-area-inset-top));right:8px;font-size:10px;
   color:var(--dim);background:#0006;padding:3px 7px;border-radius:7px;z-index:40}
+.langsel{position:fixed;top:calc(4px + env(safe-area-inset-top));left:8px;font-size:10px;
+  color:var(--ink);background:#0006;border:1px solid #ffffff2b;border-radius:7px;
+  padding:2px 4px;z-index:40}
 </style>
 </head>
 <body>
 
 <div class="net" id="net">—</div>
+<select class="langsel" id="langsel"></select>
 
 <div class="screen on" id="sc-home">
   <div class="center">
     <h1 class="logo">1</h1>
-    <div class="sub">uno contro tutti</div>
-    <div class="muted">Niente account, niente installazione.<br>Crea una stanza, mostra il QR, si gioca.</div>
-    <input type="text" id="nick" maxlength="12" placeholder="Il tuo nome">
-    <input type="text" id="createpass" maxlength="16" placeholder="password stanza"
+    <div class="sub" data-i18n="app.tagline"></div>
+    <div class="muted" data-i18n-html="home.desc"></div>
+    <input type="text" id="nick" maxlength="12" data-i18n-ph="ph.name">
+    <input type="text" id="createpass" maxlength="16" data-i18n-ph="ph.roomPassword"
            style="text-transform:uppercase;letter-spacing:3px">
-    <button class="btn" id="b-create">Crea una stanza</button>
-    <div class="sep">— oppure —</div>
-    <input type="text" id="joincode" maxlength="6" placeholder="CODICE" style="text-transform:uppercase">
-    <input type="text" id="joinpass" maxlength="16" placeholder="PASSWORD" style="text-transform:uppercase;letter-spacing:3px">
-    <button class="btn sec" id="b-join">Entra in una stanza</button>
+    <button class="btn" id="b-create" data-i18n="home.createBtn"></button>
+    <div class="sep" data-i18n="home.or"></div>
+    <input type="text" id="joincode" maxlength="6" data-i18n-ph="ph.code" style="text-transform:uppercase">
+    <input type="text" id="joinpass" maxlength="16" data-i18n-ph="ph.password" style="text-transform:uppercase;letter-spacing:3px">
+    <button class="btn sec" id="b-join" data-i18n="home.joinBtn"></button>
     <div class="muted" id="homeerr" style="color:var(--r)"></div>
   </div>
 </div>
@@ -220,57 +224,51 @@ input[type=text]:focus{border-color:var(--y)}
 <div class="screen" id="sc-join">
   <div class="center">
     <h1 class="logo" style="font-size:52px">1</h1>
-    <div class="muted">Stai entrando nella stanza</div>
+    <div class="muted" data-i18n="join.entering"></div>
     <div class="code" id="joinroom">——————</div>
-    <input type="text" id="jnick" maxlength="12" placeholder="Il tuo nome">
-    <input type="text" id="jpass" maxlength="16" placeholder="PASSWORD"
+    <input type="text" id="jnick" maxlength="12" data-i18n-ph="ph.name">
+    <input type="text" id="jpass" maxlength="16" data-i18n-ph="ph.password"
            style="text-transform:uppercase;letter-spacing:3px">
-    <button class="btn" id="b-join2">Entra</button>
+    <button class="btn" id="b-join2" data-i18n="join.enterBtn"></button>
     <div class="muted" id="joinerr" style="color:var(--r)"></div>
-    <div class="muted">La password te la dice chi ha creato la stanza:<br>
-      è scritta sul suo schermo, sotto il QR.</div>
-    <button class="btn sec sm" id="b-back">Non è questa la stanza</button>
+    <div class="muted" data-i18n-html="join.passwordHint"></div>
+    <button class="btn sec sm" id="b-back" data-i18n="join.wrongRoom"></button>
   </div>
 </div>
 
 <div class="screen" id="sc-lobby">
   <div class="center">
-    <div class="muted">Inquadra il QR o usa il codice</div>
+    <div class="muted" data-i18n="lobby.scanHint"></div>
     <div class="code" id="roomcode">——————</div>
     <canvas id="qr"></canvas>
-    <div class="qrnote" id="qrnote" style="display:none">
-      Qui non conosco il mio indirizzo pubblico.<br>
-      Incolla sotto il link della pagina e il QR compare.</div>
-    <div class="pwbox">la password non è nel QR: dilla a voce
+    <div class="qrnote" id="qrnote" style="display:none" data-i18n-html="lobby.qrUnknown"></div>
+    <div class="pwbox"><span data-i18n="lobby.pwNotInQr"></span>
       <div class="pw" id="roompass">————</div></div>
     <input type="text" id="invite" style="font-size:12px;padding:9px 12px"
-           placeholder="https://… (indirizzo pubblico della pagina)">
-    <button class="btn sec sm" id="b-copy">Copia link invito</button>
-    <div class="muted" id="framehint" style="display:none">
-      Stai guardando un'anteprima incorporata, quindi il link che vedi qui non
-      funziona dai telefoni. Apri la pagina al suo indirizzo pubblico, oppure
-      incollalo nel campo qui sopra: al codice stanza ci penso io.</div>
+           data-i18n-ph="ph.publicUrl">
+    <button class="btn sec sm" id="b-copy" data-i18n="lobby.copyBtn"></button>
+    <div class="muted" id="framehint" style="display:none" data-i18n="lobby.frameHint"></div>
     <div class="plist" id="lobbylist"></div>
     <div class="opts" id="opts" style="display:none">
       <label class="opt"><input type="checkbox" id="o-strict4" checked>
-        Pesca Quattro solo se non hai il colore <em>(ufficiale)</em></label>
+        <span data-i18n-html="opt.strict4"></span></label>
       <label class="opt"><input type="checkbox" id="o-strictw">
-        Cambia Colore solo se non puoi giocare altro</label>
+        <span data-i18n="opt.strictw"></span></label>
       <label class="opt"><input type="checkbox" id="o-freedraw" checked>
-        Dopo aver pescato puoi giocare qualsiasi carta</label>
+        <span data-i18n="opt.freedraw"></span></label>
       <label class="opt"><input type="checkbox" id="o-stack">
-        Accumula le pescate (+2 su +2, +4 su +4)</label>
+        <span data-i18n="opt.stack"></span></label>
       <label class="opt"><input type="checkbox" id="o-handover" checked>
-        Se l'host si stacca, un altro prende la partita</label>
+        <span data-i18n="opt.handover"></span></label>
       <div class="botrow">
-        <span>Avversari del computer</span>
+        <span data-i18n="lobby.botOpponents"></span>
         <button class="chip" id="bot-minus">−</button>
         <b id="botn">0</b>
         <button class="chip" id="bot-plus">+</button>
         <button class="chip on" id="bot-level">normale</button>
       </div>
     </div>
-    <button class="btn" id="b-start">Inizia partita</button>
+    <button class="btn" id="b-start" data-i18n="lobby.startBtn"></button>
     <div class="muted" id="lobbyhint"></div>
   </div>
 </div>
@@ -283,15 +281,15 @@ input[type=text]:focus{border-color:var(--y)}
       <div class="deckwrap" id="deck"><div class="card back"></div><div class="n" id="deckn"></div></div>
       <div id="discard"></div>
     </div>
-    <div class="colorbar"><span>colore in gioco</span><span class="swatch" id="swatch"></span></div>
+    <div class="colorbar"><span data-i18n="game.colorInPlay"></span><span class="swatch" id="swatch"></span></div>
     <div class="log" id="log"></div>
   </div>
   <div class="handwrap">
     <div class="mystatus" id="mystatus"></div>
     <div class="actions" id="actions"></div>
     <div class="handtools">
-      <button class="chip" id="b-view">◗ Ventaglio</button>
-      <button class="chip" id="b-hint">Aiuti</button>
+      <button class="chip" id="b-view"></button>
+      <button class="chip" id="b-hint"></button>
     </div>
     <div class="hand fan" id="hand"></div>
   </div>
@@ -324,6 +322,451 @@ const stores=()=>{ const o=[]; try{ if(localStorage) o.push(localStorage); }catc
   try{ if(sessionStorage) o.push(sessionStorage); }catch(e){} return o; };
 const keep=(k,v)=>{ for(const s of stores()) try{ s.setItem(k,v); }catch(e){} };
 const recall=k=>{ for(const s of stores()) try{ const v=s.getItem(k); if(v) return v; }catch(e){} return ''; };
+
+/* --------------------------------------------------------------------- I18N
+   Tutto il testo passa da qui: markup statico via data-i18n[-html|-ph],
+   testo generato in JS via t()/tn(). I messaggi di rete (log di partita,
+   errori di validazione) viaggiano come {k,p} — chiave + parametri grezzi —
+   e si traducono sul dispositivo di chi guarda, non su quello che li genera:
+   altrimenti l'host deciderebbe la lingua per tutti.                        */
+const LANGS=['it','en','es','fr','de','pt'];
+const LANGNAMES={it:'Italiano',en:'English',es:'Español',fr:'Français',de:'Deutsch',pt:'Português'};
+const I18N={
+it:{
+'app.title':'One','app.tagline':'uno contro tutti',
+'home.desc':'Niente account, niente installazione.<br>Crea una stanza, mostra il QR, si gioca.',
+'home.createBtn':'Crea una stanza','home.or':'— oppure —','home.joinBtn':'Entra in una stanza',
+'ph.name':'Il tuo nome','ph.roomPassword':'password stanza','ph.code':'CODICE','ph.password':'PASSWORD','ph.publicUrl':'https://… (indirizzo pubblico della pagina)',
+'err.invalidCode':'Codice non valido.','err.needPassword':'Serve la password della stanza.',
+'join.entering':'Stai entrando nella stanza','join.enterBtn':'Entra',
+'join.passwordHint':'La password te la dice chi ha creato la stanza:<br>è scritta sul suo schermo, sotto il QR.',
+'join.wrongRoom':'Non è questa la stanza',
+'lobby.scanHint':'Inquadra il QR o usa il codice',
+'lobby.qrUnknown':'Qui non conosco il mio indirizzo pubblico.<br>Incolla sotto il link della pagina e il QR compare.',
+'lobby.pwNotInQr':'la password non è nel QR: dilla a voce',
+'lobby.copyBtn':'Copia link invito','lobby.copied':'Copiato ✓',
+'lobby.frameHint':'Stai guardando un\'anteprima incorporata, quindi il link che vedi qui non funziona dai telefoni. Apri la pagina al suo indirizzo pubblico, oppure incollalo nel campo qui sopra: al codice stanza ci penso io.',
+'lobby.youTag':'tu','lobby.computerTag':'computer',
+'opt.strict4':'Pesca Quattro solo se non hai il colore <em>(ufficiale)</em>',
+'opt.strictw':'Cambia Colore solo se non puoi giocare altro',
+'opt.freedraw':'Dopo aver pescato puoi giocare qualsiasi carta',
+'opt.stack':'Accumula le pescate (+2 su +2, +4 su +4)',
+'opt.handover':'Se l\'host si stacca, un altro prende la partita',
+'lobby.botOpponents':'Avversari del computer',
+'level.facile':'facile','level.normale':'normale','level.tosto':'tosto',
+'lobby.startBtn':'Inizia partita',
+'lobby.hintWaitPlayers':'Aspetta qualcuno, oppure aggiungi un avversario del computer e gioca subito.',
+'lobby.hint2to10':'Da 2 a 10 giocatori.','lobby.hintWaitHost':'In attesa che l\'host inizi…',
+'game.clockwise':'senso orario ↻','game.counterclockwise':'senso antiorario ↺',
+'game.stackBadge':'+{n} in canna','game.colorInPlay':'colore in gioco',
+'game.deckCount.one':'{n} carta','game.deckCount.other':'{n} carte',
+'game.playDrawnOrPass':'Gioca la carta pescata o passa',
+'game.respondOrDraw':'Rispondi con un {type} o pesca {n}','game.yourTurn':'Tocca a te',
+'game.draw':'Pesca','game.drawN':'Pesca {n}','game.passBtn':'Passa','game.unoBtn':'UNO !',
+'view.fan':'◗ Ventaglio','view.fila':'▤ Fila','view.griglia':'▦ Griglia',
+'hints.on':'◉ Aiuti: sì','hints.off':'○ Aiuti: no',
+'game.you':'Tu','game.pts':'{n} pt','game.catchBang':'becca!',
+'overlay.chooseColor':'Scegli il colore','overlay.gameOver':'🏆 Partita finita','overlay.roundEnd':'Mano conclusa',
+'overlay.winnerGame':'{name} vince la partita.','overlay.winnerRound':'{name} chiude la mano.',
+'overlay.newGame':'Nuova partita','overlay.nextRound':'Mano successiva','overlay.waitingHost':'In attesa dell\'host…',
+'status.connecting':'connessione…','status.waiting':'in attesa','status.p2pDirect':'P2P diretto',
+'status.p2pMixed':'misto P2P/relay','status.relay':'relay cifrato','status.localGame':'partita locale',
+'status.channel.one':'{n} canale','status.channel.other':'{n} canali','status.noChannel':'nessun canale',
+'status.newHostReconnecting':'nuovo host, ricollegamento…','status.youOffline':'sei offline','status.hostUnreachable':'host non raggiungibile',
+'err.notConnected':'non sei connesso all\'host','err.noResponseHost':'Nessuna risposta. Controlla codice e password, oppure l\'host non è in linea.',
+'err.noChannel':'Nessun canale raggiungibile. Rete bloccata o sei offline?',
+'info.tookOverReconnect':'Un altro giocatore ha preso in mano la partita: ti ricolleghi.',
+'color.r':'Rosso','color.g':'Verde','color.b':'Blu','color.y':'Giallo',
+'card.skip':'Salta','card.reverse':'Inverti','card.drawtwo':'Pesca Due','card.wild':'Cambia Colore','card.drawfour':'Pesca Quattro',
+'log.newRound':'Nuova mano. Inizia {name}.','log.skipTurn':'{name} salta il turno.',
+'log.reverseStart':'Si parte al contrario.','log.stackStart':'Pesca Due iniziale: {n} in canna.',
+'log.drawAndSkip':'{name} pesca {n} e salta.','log.play':'{name} gioca {card}.','log.playWild':'{name} gioca {card} → {color}.',
+'log.reverseAsSkip':'Inverti: in due vale come salta.','log.reverseChanged':'Senso invertito.',
+'log.stackAdd':'In canna: {n} carte da pescare.','log.drawStack':'{name} incassa {n} carte.',
+'log.draw':'{name} pesca.','log.pass':'{name} passa.','log.sayOne':'{name} dice "UNO!"',
+'log.caught':'{catcher} becca {target}: +2 carte!','log.offlineSkip':'{name} è offline: turno saltato.',
+'log.roundClosed':'{name} chiude la mano: +{pts} punti.','log.reconnected':'{name} è rientrato.',
+'log.reshuffled':'Mazzo rimescolato.','log.notResponding':'{name} non risponde.','log.tookOver':'{name} prende in mano la partita.',
+'err.mustRespond':'devi rispondere con un {type} o pescare {n}','err.notPlayable':'carta non giocabile',
+'err.stillHaveColor':'hai ancora carte {color}: non puoi giocare il Pesca Quattro',
+'err.haveOtherPlayable':'hai altre carte giocabili: il Cambia Colore si tiene per quando sei bloccato',
+'err.notActive':'partita non attiva','err.notYourTurn':'non è il tuo turno','err.noSuchCard':'carta inesistente',
+'err.onlyDrawnCard':'puoi giocare solo la carta appena pescata','err.alreadyDrew':'hai già pescato',
+'err.deckEmpty':'mazzo esaurito','err.mustDrawFirst':'devi prima pescare','err.unknownPlayer':'giocatore ignoto',
+'err.tooManyForOne':'hai troppe carte per dire 1','err.nothingToCatch':'niente da beccare','err.no':'no',
+'default.hostName':'Host','default.guestName':'Ospite','default.anon':'Anonimo','join.reenterPassword':'Reinserisci la password per rientrare.'
+},
+en:{
+'app.title':'One','app.tagline':'one against all',
+'home.desc':'No account, nothing to install.<br>Create a room, show the QR code, and play.',
+'home.createBtn':'Create a room','home.or':'— or —','home.joinBtn':'Join a room',
+'ph.name':'Your name','ph.roomPassword':'room password','ph.code':'CODE','ph.password':'PASSWORD','ph.publicUrl':'https://… (public address of this page)',
+'err.invalidCode':'Invalid code.','err.needPassword':'The room password is required.',
+'join.entering':'You are entering room','join.enterBtn':'Join',
+'join.passwordHint':'Whoever created the room can tell you the password:<br>it\'s shown on their screen, under the QR code.',
+'join.wrongRoom':'This isn\'t the right room',
+'lobby.scanHint':'Scan the QR code or use the code',
+'lobby.qrUnknown':'I don\'t know my public address here.<br>Paste the page\'s link below and the QR code will appear.',
+'lobby.pwNotInQr':'the password isn\'t in the QR code: say it out loud',
+'lobby.copyBtn':'Copy invite link','lobby.copied':'Copied ✓',
+'lobby.frameHint':'You\'re viewing an embedded preview, so the link shown here won\'t work from phones. Open the page at its public address, or paste it in the field above: I\'ll take care of the room code.',
+'lobby.youTag':'you','lobby.computerTag':'computer',
+'opt.strict4':'Draw Four only if you don\'t have the color <em>(official)</em>',
+'opt.strictw':'Wild only if you have no other playable card',
+'opt.freedraw':'After drawing you can play any card',
+'opt.stack':'Stack draws (+2 on +2, +4 on +4)',
+'opt.handover':'If the host disconnects, another player takes over the game',
+'lobby.botOpponents':'Computer opponents',
+'level.facile':'easy','level.normale':'normal','level.tosto':'hard',
+'lobby.startBtn':'Start game',
+'lobby.hintWaitPlayers':'Wait for someone, or add a computer opponent and play right away.',
+'lobby.hint2to10':'From 2 to 10 players.','lobby.hintWaitHost':'Waiting for the host to start…',
+'game.clockwise':'clockwise ↻','game.counterclockwise':'counter-clockwise ↺',
+'game.stackBadge':'+{n} stacked','game.colorInPlay':'color in play',
+'game.deckCount.one':'{n} card','game.deckCount.other':'{n} cards',
+'game.playDrawnOrPass':'Play the drawn card or pass',
+'game.respondOrDraw':'Respond with a {type} or draw {n}','game.yourTurn':'Your turn',
+'game.draw':'Draw','game.drawN':'Draw {n}','game.passBtn':'Pass','game.unoBtn':'UNO !',
+'view.fan':'◗ Fan','view.fila':'▤ Row','view.griglia':'▦ Grid',
+'hints.on':'◉ Hints: on','hints.off':'○ Hints: off',
+'game.you':'You','game.pts':'{n} pt','game.catchBang':'catch!',
+'overlay.chooseColor':'Choose a color','overlay.gameOver':'🏆 Game over','overlay.roundEnd':'Round over',
+'overlay.winnerGame':'{name} wins the game.','overlay.winnerRound':'{name} closes the round.',
+'overlay.newGame':'New game','overlay.nextRound':'Next round','overlay.waitingHost':'Waiting for the host…',
+'status.connecting':'connecting…','status.waiting':'waiting','status.p2pDirect':'direct P2P',
+'status.p2pMixed':'mixed P2P/relay','status.relay':'encrypted relay','status.localGame':'local game',
+'status.channel.one':'{n} channel','status.channel.other':'{n} channels','status.noChannel':'no channel',
+'status.newHostReconnecting':'new host, reconnecting…','status.youOffline':'you are offline','status.hostUnreachable':'host unreachable',
+'err.notConnected':'you are not connected to the host','err.noResponseHost':'No response. Check the code and password, or the host may be offline.',
+'err.noChannel':'No channel reachable. Blocked network, or are you offline?',
+'info.tookOverReconnect':'Another player has taken over the game: reconnecting.',
+'color.r':'Red','color.g':'Green','color.b':'Blue','color.y':'Yellow',
+'card.skip':'Skip','card.reverse':'Reverse','card.drawtwo':'Draw Two','card.wild':'Wild','card.drawfour':'Draw Four',
+'log.newRound':'New round. {name} starts.','log.skipTurn':'{name} is skipped.',
+'log.reverseStart':'Starting in reverse.','log.stackStart':'Initial Draw Two: {n} stacked.',
+'log.drawAndSkip':'{name} draws {n} and is skipped.','log.play':'{name} plays {card}.','log.playWild':'{name} plays {card} → {color}.',
+'log.reverseAsSkip':'Reverse: with two players it works like Skip.','log.reverseChanged':'Direction reversed.',
+'log.stackAdd':'Stacked: {n} cards to draw.','log.drawStack':'{name} collects {n} cards.',
+'log.draw':'{name} draws.','log.pass':'{name} passes.','log.sayOne':'{name} says "UNO!"',
+'log.caught':'{catcher} catches {target}: +2 cards!','log.offlineSkip':'{name} is offline: turn skipped.',
+'log.roundClosed':'{name} closes the round: +{pts} points.','log.reconnected':'{name} is back.',
+'log.reshuffled':'Deck reshuffled.','log.notResponding':'{name} is not responding.','log.tookOver':'{name} takes over the game.',
+'err.mustRespond':'you must respond with a {type} or draw {n}','err.notPlayable':'card not playable',
+'err.stillHaveColor':'you still have {color} cards: you can\'t play Draw Four',
+'err.haveOtherPlayable':'you have other playable cards: save Wild for when you\'re stuck',
+'err.notActive':'game not active','err.notYourTurn':'it\'s not your turn','err.noSuchCard':'no such card',
+'err.onlyDrawnCard':'you can only play the card you just drew','err.alreadyDrew':'you already drew',
+'err.deckEmpty':'deck empty','err.mustDrawFirst':'you must draw first','err.unknownPlayer':'unknown player',
+'err.tooManyForOne':'you have too many cards to say UNO','err.nothingToCatch':'nothing to catch','err.no':'no',
+'default.hostName':'Host','default.guestName':'Guest','default.anon':'Anonymous','join.reenterPassword':'Re-enter the password to rejoin.'
+},
+es:{
+'app.title':'One','app.tagline':'uno contra todos',
+'home.desc':'Sin cuenta, sin instalar nada.<br>Crea una sala, muestra el código QR y juega.',
+'home.createBtn':'Crear una sala','home.or':'— o —','home.joinBtn':'Unirse a una sala',
+'ph.name':'Tu nombre','ph.roomPassword':'contraseña de la sala','ph.code':'CÓDIGO','ph.password':'CONTRASEÑA','ph.publicUrl':'https://… (dirección pública de esta página)',
+'err.invalidCode':'Código no válido.','err.needPassword':'Se necesita la contraseña de la sala.',
+'join.entering':'Estás entrando a la sala','join.enterBtn':'Entrar',
+'join.passwordHint':'Quien creó la sala te dirá la contraseña:<br>está en su pantalla, debajo del código QR.',
+'join.wrongRoom':'Esta no es la sala',
+'lobby.scanHint':'Escanea el código QR o usa el código',
+'lobby.qrUnknown':'Aquí no conozco mi dirección pública.<br>Pega abajo el enlace de la página y aparecerá el código QR.',
+'lobby.pwNotInQr':'la contraseña no está en el QR: dila en voz alta',
+'lobby.copyBtn':'Copiar enlace de invitación','lobby.copied':'Copiado ✓',
+'lobby.frameHint':'Estás viendo una vista previa incrustada, así que el enlace que ves aquí no funcionará desde teléfonos. Abre la página en su dirección pública, o pégala en el campo de arriba: yo me encargo del código de sala.',
+'lobby.youTag':'tú','lobby.computerTag':'computadora',
+'opt.strict4':'Roba Cuatro solo si no tienes el color <em>(oficial)</em>',
+'opt.strictw':'Cambia Color solo si no puedes jugar otra carta',
+'opt.freedraw':'Después de robar puedes jugar cualquier carta',
+'opt.stack':'Acumula las robadas (+2 sobre +2, +4 sobre +4)',
+'opt.handover':'Si el anfitrión se desconecta, otro jugador toma la partida',
+'lobby.botOpponents':'Oponentes de la computadora',
+'level.facile':'fácil','level.normale':'normal','level.tosto':'difícil',
+'lobby.startBtn':'Empezar partida',
+'lobby.hintWaitPlayers':'Espera a alguien, o añade un oponente de computadora y juega ya.',
+'lobby.hint2to10':'De 2 a 10 jugadores.','lobby.hintWaitHost':'Esperando a que el anfitrión empiece…',
+'game.clockwise':'sentido horario ↻','game.counterclockwise':'sentido antihorario ↺',
+'game.stackBadge':'+{n} acumuladas','game.colorInPlay':'color en juego',
+'game.deckCount.one':'{n} carta','game.deckCount.other':'{n} cartas',
+'game.playDrawnOrPass':'Juega la carta robada o pasa',
+'game.respondOrDraw':'Responde con un {type} o roba {n}','game.yourTurn':'Es tu turno',
+'game.draw':'Robar','game.drawN':'Robar {n}','game.passBtn':'Pasar','game.unoBtn':'¡UNO!',
+'view.fan':'◗ Abanico','view.fila':'▤ Fila','view.griglia':'▦ Cuadrícula',
+'hints.on':'◉ Ayudas: sí','hints.off':'○ Ayudas: no',
+'game.you':'Tú','game.pts':'{n} pt','game.catchBang':'¡pilla!',
+'overlay.chooseColor':'Elige el color','overlay.gameOver':'🏆 Partida terminada','overlay.roundEnd':'Mano terminada',
+'overlay.winnerGame':'{name} gana la partida.','overlay.winnerRound':'{name} cierra la mano.',
+'overlay.newGame':'Nueva partida','overlay.nextRound':'Siguiente mano','overlay.waitingHost':'Esperando al anfitrión…',
+'status.connecting':'conectando…','status.waiting':'esperando','status.p2pDirect':'P2P directo',
+'status.p2pMixed':'P2P/relay mixto','status.relay':'relay cifrado','status.localGame':'partida local',
+'status.channel.one':'{n} canal','status.channel.other':'{n} canales','status.noChannel':'sin canal',
+'status.newHostReconnecting':'nuevo anfitrión, reconectando…','status.youOffline':'estás sin conexión','status.hostUnreachable':'anfitrión inaccesible',
+'err.notConnected':'no estás conectado al anfitrión','err.noResponseHost':'Sin respuesta. Comprueba el código y la contraseña, o el anfitrión puede estar desconectado.',
+'err.noChannel':'Ningún canal accesible. ¿Red bloqueada o estás sin conexión?',
+'info.tookOverReconnect':'Otro jugador ha tomado la partida: reconectando.',
+'color.r':'Rojo','color.g':'Verde','color.b':'Azul','color.y':'Amarillo',
+'card.skip':'Salta','card.reverse':'Invierte','card.drawtwo':'Roba Dos','card.wild':'Cambia Color','card.drawfour':'Roba Cuatro',
+'log.newRound':'Nueva mano. Empieza {name}.','log.skipTurn':'{name} se salta el turno.',
+'log.reverseStart':'Se empieza al revés.','log.stackStart':'Roba Dos inicial: {n} acumuladas.',
+'log.drawAndSkip':'{name} roba {n} y pierde el turno.','log.play':'{name} juega {card}.','log.playWild':'{name} juega {card} → {color}.',
+'log.reverseAsSkip':'Invierte: con dos jugadores equivale a saltar.','log.reverseChanged':'Sentido invertido.',
+'log.stackAdd':'Acumuladas: {n} cartas por robar.','log.drawStack':'{name} recoge {n} cartas.',
+'log.draw':'{name} roba.','log.pass':'{name} pasa.','log.sayOne':'{name} dice "¡UNO!"',
+'log.caught':'{catcher} pilla a {target}: ¡+2 cartas!','log.offlineSkip':'{name} está sin conexión: turno saltado.',
+'log.roundClosed':'{name} cierra la mano: +{pts} puntos.','log.reconnected':'{name} ha vuelto.',
+'log.reshuffled':'Mazo rebarajado.','log.notResponding':'{name} no responde.','log.tookOver':'{name} toma la partida.',
+'err.mustRespond':'debes responder con un {type} o robar {n}','err.notPlayable':'carta no jugable',
+'err.stillHaveColor':'aún tienes cartas de color {color}: no puedes jugar Roba Cuatro',
+'err.haveOtherPlayable':'tienes otras cartas jugables: guarda el Cambia Color para cuando estés bloqueado',
+'err.notActive':'la partida no está activa','err.notYourTurn':'no es tu turno','err.noSuchCard':'esa carta no existe',
+'err.onlyDrawnCard':'solo puedes jugar la carta que acabas de robar','err.alreadyDrew':'ya has robado',
+'err.deckEmpty':'mazo agotado','err.mustDrawFirst':'primero tienes que robar','err.unknownPlayer':'jugador desconocido',
+'err.tooManyForOne':'tienes demasiadas cartas para decir UNO','err.nothingToCatch':'no hay nada que pillar','err.no':'no',
+'default.hostName':'Anfitrión','default.guestName':'Invitado','default.anon':'Anónimo','join.reenterPassword':'Vuelve a introducir la contraseña para reincorporarte.'
+},
+fr:{
+'app.title':'One','app.tagline':'un contre tous',
+'home.desc':'Pas de compte, rien à installer.<br>Crée une salle, montre le QR code, et jouez.',
+'home.createBtn':'Créer une salle','home.or':'— ou —','home.joinBtn':'Rejoindre une salle',
+'ph.name':'Ton nom','ph.roomPassword':'mot de passe de la salle','ph.code':'CODE','ph.password':'MOT DE PASSE','ph.publicUrl':'https://… (adresse publique de cette page)',
+'err.invalidCode':'Code invalide.','err.needPassword':'Le mot de passe de la salle est requis.',
+'join.entering':'Tu entres dans la salle','join.enterBtn':'Entrer',
+'join.passwordHint':'La personne qui a créé la salle te donne le mot de passe :<br>il est affiché sur son écran, sous le QR code.',
+'join.wrongRoom':'Ce n\'est pas la bonne salle',
+'lobby.scanHint':'Scanne le QR code ou utilise le code',
+'lobby.qrUnknown':'Je ne connais pas mon adresse publique ici.<br>Colle le lien de la page ci-dessous et le QR code apparaîtra.',
+'lobby.pwNotInQr':'le mot de passe n\'est pas dans le QR code : dis-le à voix haute',
+'lobby.copyBtn':'Copier le lien d\'invitation','lobby.copied':'Copié ✓',
+'lobby.frameHint':'Tu regardes un aperçu intégré, donc le lien affiché ici ne fonctionnera pas depuis un téléphone. Ouvre la page à son adresse publique, ou colle-la dans le champ ci-dessus : je m\'occupe du code de salle.',
+'lobby.youTag':'toi','lobby.computerTag':'ordinateur',
+'opt.strict4':'Plus Quatre seulement si tu n\'as pas la couleur <em>(officiel)</em>',
+'opt.strictw':'Joker seulement si tu ne peux jouer aucune autre carte',
+'opt.freedraw':'Après avoir pioché tu peux jouer n\'importe quelle carte',
+'opt.stack':'Cumule les pioches (+2 sur +2, +4 sur +4)',
+'opt.handover':'Si l\'hôte se déconnecte, un autre joueur reprend la partie',
+'lobby.botOpponents':'Adversaires ordinateur',
+'level.facile':'facile','level.normale':'normal','level.tosto':'difficile',
+'lobby.startBtn':'Commencer la partie',
+'lobby.hintWaitPlayers':'Attends quelqu\'un, ou ajoute un adversaire ordinateur et joue tout de suite.',
+'lobby.hint2to10':'De 2 à 10 joueurs.','lobby.hintWaitHost':'En attente que l\'hôte commence…',
+'game.clockwise':'sens horaire ↻','game.counterclockwise':'sens antihoraire ↺',
+'game.stackBadge':'+{n} cumulées','game.colorInPlay':'couleur en jeu',
+'game.deckCount.one':'{n} carte','game.deckCount.other':'{n} cartes',
+'game.playDrawnOrPass':'Joue la carte piochée ou passe',
+'game.respondOrDraw':'Réponds avec un {type} ou pioche {n}','game.yourTurn':'À toi de jouer',
+'game.draw':'Piocher','game.drawN':'Piocher {n}','game.passBtn':'Passer','game.unoBtn':'UNO !',
+'view.fan':'◗ Éventail','view.fila':'▤ Ligne','view.griglia':'▦ Grille',
+'hints.on':'◉ Aides : oui','hints.off':'○ Aides : non',
+'game.you':'Toi','game.pts':'{n} pt','game.catchBang':'attrape !',
+'overlay.chooseColor':'Choisis la couleur','overlay.gameOver':'🏆 Partie terminée','overlay.roundEnd':'Manche terminée',
+'overlay.winnerGame':'{name} remporte la partie.','overlay.winnerRound':'{name} termine la manche.',
+'overlay.newGame':'Nouvelle partie','overlay.nextRound':'Manche suivante','overlay.waitingHost':'En attente de l\'hôte…',
+'status.connecting':'connexion…','status.waiting':'en attente','status.p2pDirect':'P2P direct',
+'status.p2pMixed':'P2P/relais mixte','status.relay':'relais chiffré','status.localGame':'partie locale',
+'status.channel.one':'{n} canal','status.channel.other':'{n} canaux','status.noChannel':'aucun canal',
+'status.newHostReconnecting':'nouvel hôte, reconnexion…','status.youOffline':'tu es hors ligne','status.hostUnreachable':'hôte injoignable',
+'err.notConnected':'tu n\'es pas connecté à l\'hôte','err.noResponseHost':'Aucune réponse. Vérifie le code et le mot de passe, ou l\'hôte est peut-être hors ligne.',
+'err.noChannel':'Aucun canal joignable. Réseau bloqué, ou es-tu hors ligne ?',
+'info.tookOverReconnect':'Un autre joueur a repris la partie : reconnexion.',
+'color.r':'Rouge','color.g':'Vert','color.b':'Bleu','color.y':'Jaune',
+'card.skip':'Passe','card.reverse':'Inverse','card.drawtwo':'Plus Deux','card.wild':'Joker','card.drawfour':'Plus Quatre',
+'log.newRound':'Nouvelle manche. {name} commence.','log.skipTurn':'{name} passe son tour.',
+'log.reverseStart':'On part à l\'envers.','log.stackStart':'Plus Deux initial : {n} cumulées.',
+'log.drawAndSkip':'{name} pioche {n} et passe son tour.','log.play':'{name} joue {card}.','log.playWild':'{name} joue {card} → {color}.',
+'log.reverseAsSkip':'Inverse : à deux, ça revient à passer.','log.reverseChanged':'Sens inversé.',
+'log.stackAdd':'Cumulées : {n} cartes à piocher.','log.drawStack':'{name} récupère {n} cartes.',
+'log.draw':'{name} pioche.','log.pass':'{name} passe.','log.sayOne':'{name} dit « UNO ! »',
+'log.caught':'{catcher} attrape {target} : +2 cartes !','log.offlineSkip':'{name} est hors ligne : tour passé.',
+'log.roundClosed':'{name} termine la manche : +{pts} points.','log.reconnected':'{name} est de retour.',
+'log.reshuffled':'Paquet remélangé.','log.notResponding':'{name} ne répond pas.','log.tookOver':'{name} reprend la partie.',
+'err.mustRespond':'tu dois répondre avec un {type} ou piocher {n}','err.notPlayable':'carte non jouable',
+'err.stillHaveColor':'tu as encore des cartes {color} : tu ne peux pas jouer Plus Quatre',
+'err.haveOtherPlayable':'tu as d\'autres cartes jouables : garde le Joker pour quand tu es bloqué',
+'err.notActive':'partie non active','err.notYourTurn':'ce n\'est pas ton tour','err.noSuchCard':'carte inexistante',
+'err.onlyDrawnCard':'tu ne peux jouer que la carte que tu viens de piocher','err.alreadyDrew':'tu as déjà pioché',
+'err.deckEmpty':'pioche épuisée','err.mustDrawFirst':'tu dois d\'abord piocher','err.unknownPlayer':'joueur inconnu',
+'err.tooManyForOne':'tu as trop de cartes pour dire UNO','err.nothingToCatch':'rien à attraper','err.no':'non',
+'default.hostName':'Hôte','default.guestName':'Invité','default.anon':'Anonyme','join.reenterPassword':'Ressaisis le mot de passe pour revenir.'
+},
+de:{
+'app.title':'One','app.tagline':'einer gegen alle',
+'home.desc':'Kein Konto, nichts zu installieren.<br>Erstelle einen Raum, zeig den QR-Code, und los geht\'s.',
+'home.createBtn':'Raum erstellen','home.or':'— oder —','home.joinBtn':'Raum beitreten',
+'ph.name':'Dein Name','ph.roomPassword':'Raumpasswort','ph.code':'CODE','ph.password':'PASSWORT','ph.publicUrl':'https://… (öffentliche Adresse dieser Seite)',
+'err.invalidCode':'Ungültiger Code.','err.needPassword':'Das Raumpasswort wird benötigt.',
+'join.entering':'Du betrittst den Raum','join.enterBtn':'Beitreten',
+'join.passwordHint':'Die Person, die den Raum erstellt hat, nennt dir das Passwort:<br>es steht auf ihrem Bildschirm, unter dem QR-Code.',
+'join.wrongRoom':'Das ist nicht der richtige Raum',
+'lobby.scanHint':'Scanne den QR-Code oder benutze den Code',
+'lobby.qrUnknown':'Hier kenne ich meine öffentliche Adresse nicht.<br>Füge unten den Link der Seite ein, dann erscheint der QR-Code.',
+'lobby.pwNotInQr':'das Passwort steht nicht im QR-Code: sag es laut',
+'lobby.copyBtn':'Einladungslink kopieren','lobby.copied':'Kopiert ✓',
+'lobby.frameHint':'Du siehst eine eingebettete Vorschau, daher funktioniert der hier gezeigte Link nicht auf Handys. Öffne die Seite unter ihrer öffentlichen Adresse, oder füge sie oben ein: um den Raumcode kümmere ich mich.',
+'lobby.youTag':'du','lobby.computerTag':'Computer',
+'opt.strict4':'Plus Vier nur, wenn du die Farbe nicht hast <em>(offiziell)</em>',
+'opt.strictw':'Farbwechsel nur, wenn du keine andere Karte spielen kannst',
+'opt.freedraw':'Nach dem Ziehen darfst du jede Karte spielen',
+'opt.stack':'Ziehkarten stapeln (+2 auf +2, +4 auf +4)',
+'opt.handover':'Wenn der Host die Verbindung verliert, übernimmt ein anderer Spieler',
+'lobby.botOpponents':'Computergegner',
+'level.facile':'leicht','level.normale':'normal','level.tosto':'schwer',
+'lobby.startBtn':'Spiel starten',
+'lobby.hintWaitPlayers':'Warte auf jemanden, oder füge einen Computergegner hinzu und spiel sofort.',
+'lobby.hint2to10':'2 bis 10 Spieler.','lobby.hintWaitHost':'Warte, bis der Host startet…',
+'game.clockwise':'im Uhrzeigersinn ↻','game.counterclockwise':'gegen den Uhrzeigersinn ↺',
+'game.stackBadge':'+{n} gestapelt','game.colorInPlay':'aktuelle Farbe',
+'game.deckCount.one':'{n} Karte','game.deckCount.other':'{n} Karten',
+'game.playDrawnOrPass':'Spiele die gezogene Karte oder passe',
+'game.respondOrDraw':'Antworte mit einer {type} oder ziehe {n}','game.yourTurn':'Du bist dran',
+'game.draw':'Ziehen','game.drawN':'{n} ziehen','game.passBtn':'Passen','game.unoBtn':'UNO !',
+'view.fan':'◗ Fächer','view.fila':'▤ Reihe','view.griglia':'▦ Raster',
+'hints.on':'◉ Hilfen: an','hints.off':'○ Hilfen: aus',
+'game.you':'Du','game.pts':'{n} Pkt','game.catchBang':'erwischt!',
+'overlay.chooseColor':'Farbe wählen','overlay.gameOver':'🏆 Spiel beendet','overlay.roundEnd':'Runde beendet',
+'overlay.winnerGame':'{name} gewinnt das Spiel.','overlay.winnerRound':'{name} beendet die Runde.',
+'overlay.newGame':'Neues Spiel','overlay.nextRound':'Nächste Runde','overlay.waitingHost':'Warte auf den Host…',
+'status.connecting':'verbinde…','status.waiting':'wartet','status.p2pDirect':'direktes P2P',
+'status.p2pMixed':'gemischt P2P/Relay','status.relay':'verschlüsseltes Relay','status.localGame':'lokales Spiel',
+'status.channel.one':'{n} Kanal','status.channel.other':'{n} Kanäle','status.noChannel':'kein Kanal',
+'status.newHostReconnecting':'neuer Host, verbinde neu…','status.youOffline':'du bist offline','status.hostUnreachable':'Host nicht erreichbar',
+'err.notConnected':'du bist nicht mit dem Host verbunden','err.noResponseHost':'Keine Antwort. Prüfe Code und Passwort, oder der Host ist offline.',
+'err.noChannel':'Kein Kanal erreichbar. Netzwerk blockiert, oder bist du offline?',
+'info.tookOverReconnect':'Ein anderer Spieler hat das Spiel übernommen: du verbindest neu.',
+'color.r':'Rot','color.g':'Grün','color.b':'Blau','color.y':'Gelb',
+'card.skip':'Aussetzen','card.reverse':'Richtungswechsel','card.drawtwo':'Plus Zwei','card.wild':'Farbwechsel','card.drawfour':'Plus Vier',
+'log.newRound':'Neue Runde. {name} beginnt.','log.skipTurn':'{name} wird ausgesetzt.',
+'log.reverseStart':'Es geht rückwärts los.','log.stackStart':'Anfängliches Plus Zwei: {n} gestapelt.',
+'log.drawAndSkip':'{name} zieht {n} und wird ausgesetzt.','log.play':'{name} spielt {card}.','log.playWild':'{name} spielt {card} → {color}.',
+'log.reverseAsSkip':'Richtungswechsel: zu zweit wirkt das wie Aussetzen.','log.reverseChanged':'Richtung gewechselt.',
+'log.stackAdd':'Gestapelt: {n} Karten zu ziehen.','log.drawStack':'{name} nimmt {n} Karten.',
+'log.draw':'{name} zieht.','log.pass':'{name} passt.','log.sayOne':'{name} sagt „UNO!"',
+'log.caught':'{catcher} erwischt {target}: +2 Karten!','log.offlineSkip':'{name} ist offline: Zug ausgesetzt.',
+'log.roundClosed':'{name} beendet die Runde: +{pts} Punkte.','log.reconnected':'{name} ist zurück.',
+'log.reshuffled':'Stapel neu gemischt.','log.notResponding':'{name} antwortet nicht.','log.tookOver':'{name} übernimmt das Spiel.',
+'err.mustRespond':'du musst mit einer {type} antworten oder {n} ziehen','err.notPlayable':'Karte nicht spielbar',
+'err.stillHaveColor':'du hast noch Karten in {color}: du kannst Plus Vier nicht spielen',
+'err.haveOtherPlayable':'du hast andere spielbare Karten: heb den Farbwechsel auf, bis du feststeckst',
+'err.notActive':'Spiel nicht aktiv','err.notYourTurn':'du bist nicht dran','err.noSuchCard':'Karte existiert nicht',
+'err.onlyDrawnCard':'du kannst nur die gerade gezogene Karte spielen','err.alreadyDrew':'du hast schon gezogen',
+'err.deckEmpty':'Stapel leer','err.mustDrawFirst':'du musst zuerst ziehen','err.unknownPlayer':'unbekannter Spieler',
+'err.tooManyForOne':'du hast zu viele Karten, um UNO zu sagen','err.nothingToCatch':'nichts zu erwischen','err.no':'nein',
+'default.hostName':'Host','default.guestName':'Gast','default.anon':'Anonym','join.reenterPassword':'Gib das Passwort erneut ein, um wieder einzusteigen.'
+},
+pt:{
+'app.title':'One','app.tagline':'um contra todos',
+'home.desc':'Sem conta, nada para instalar.<br>Cria uma sala, mostra o código QR, e joga.',
+'home.createBtn':'Criar uma sala','home.or':'— ou —','home.joinBtn':'Entrar numa sala',
+'ph.name':'O teu nome','ph.roomPassword':'senha da sala','ph.code':'CÓDIGO','ph.password':'SENHA','ph.publicUrl':'https://… (endereço público desta página)',
+'err.invalidCode':'Código inválido.','err.needPassword':'É necessária a senha da sala.',
+'join.entering':'Estás a entrar na sala','join.enterBtn':'Entrar',
+'join.passwordHint':'Quem criou a sala diz-te a senha:<br>está no ecrã dele, por baixo do código QR.',
+'join.wrongRoom':'Esta não é a sala certa',
+'lobby.scanHint':'Aponta ao código QR ou usa o código',
+'lobby.qrUnknown':'Aqui não conheço o meu endereço público.<br>Cola abaixo o link da página e o código QR aparece.',
+'lobby.pwNotInQr':'a senha não está no QR: diz-a em voz alta',
+'lobby.copyBtn':'Copiar link de convite','lobby.copied':'Copiado ✓',
+'lobby.frameHint':'Estás a ver uma pré-visualização incorporada, por isso o link mostrado aqui não funciona em telemóveis. Abre a página no seu endereço público, ou cola-o no campo acima: eu trato do código da sala.',
+'lobby.youTag':'tu','lobby.computerTag':'computador',
+'opt.strict4':'Compra Quatro só se não tiveres a cor <em>(oficial)</em>',
+'opt.strictw':'Muda Cor só se não puderes jogar outra carta',
+'opt.freedraw':'Depois de comprar podes jogar qualquer carta',
+'opt.stack':'Acumula as compras (+2 sobre +2, +4 sobre +4)',
+'opt.handover':'Se o anfitrião se desligar, outro jogador assume o jogo',
+'lobby.botOpponents':'Adversários do computador',
+'level.facile':'fácil','level.normale':'normal','level.tosto':'difícil',
+'lobby.startBtn':'Começar o jogo',
+'lobby.hintWaitPlayers':'Espera por alguém, ou adiciona um adversário do computador e joga já.',
+'lobby.hint2to10':'De 2 a 10 jogadores.','lobby.hintWaitHost':'À espera que o anfitrião comece…',
+'game.clockwise':'sentido horário ↻','game.counterclockwise':'sentido anti-horário ↺',
+'game.stackBadge':'+{n} acumuladas','game.colorInPlay':'cor em jogo',
+'game.deckCount.one':'{n} carta','game.deckCount.other':'{n} cartas',
+'game.playDrawnOrPass':'Joga a carta comprada ou passa',
+'game.respondOrDraw':'Responde com um {type} ou compra {n}','game.yourTurn':'É a tua vez',
+'game.draw':'Comprar','game.drawN':'Comprar {n}','game.passBtn':'Passar','game.unoBtn':'UNO !',
+'view.fan':'◗ Leque','view.fila':'▤ Fila','view.griglia':'▦ Grelha',
+'hints.on':'◉ Ajudas: sim','hints.off':'○ Ajudas: não',
+'game.you':'Tu','game.pts':'{n} pt','game.catchBang':'apanha!',
+'overlay.chooseColor':'Escolhe a cor','overlay.gameOver':'🏆 Jogo terminado','overlay.roundEnd':'Mão terminada',
+'overlay.winnerGame':'{name} vence o jogo.','overlay.winnerRound':'{name} fecha a mão.',
+'overlay.newGame':'Novo jogo','overlay.nextRound':'Mão seguinte','overlay.waitingHost':'À espera do anfitrião…',
+'status.connecting':'a ligar…','status.waiting':'à espera','status.p2pDirect':'P2P direto',
+'status.p2pMixed':'P2P/relay misto','status.relay':'relay cifrado','status.localGame':'jogo local',
+'status.channel.one':'{n} canal','status.channel.other':'{n} canais','status.noChannel':'sem canal',
+'status.newHostReconnecting':'novo anfitrião, a religar…','status.youOffline':'estás offline','status.hostUnreachable':'anfitrião inacessível',
+'err.notConnected':'não estás ligado ao anfitrião','err.noResponseHost':'Sem resposta. Verifica o código e a senha, ou o anfitrião pode estar offline.',
+'err.noChannel':'Nenhum canal acessível. Rede bloqueada, ou estás offline?',
+'info.tookOverReconnect':'Outro jogador assumiu o jogo: a reconectar.',
+'color.r':'Vermelho','color.g':'Verde','color.b':'Azul','color.y':'Amarelo',
+'card.skip':'Salta','card.reverse':'Inverte','card.drawtwo':'Compra Dois','card.wild':'Muda Cor','card.drawfour':'Compra Quatro',
+'log.newRound':'Nova mão. {name} começa.','log.skipTurn':'{name} salta a vez.',
+'log.reverseStart':'Começa-se ao contrário.','log.stackStart':'Compra Dois inicial: {n} acumuladas.',
+'log.drawAndSkip':'{name} compra {n} e salta a vez.','log.play':'{name} joga {card}.','log.playWild':'{name} joga {card} → {color}.',
+'log.reverseAsSkip':'Inverte: a dois jogadores equivale a saltar.','log.reverseChanged':'Sentido invertido.',
+'log.stackAdd':'Acumuladas: {n} cartas para comprar.','log.drawStack':'{name} recolhe {n} cartas.',
+'log.draw':'{name} compra.','log.pass':'{name} passa.','log.sayOne':'{name} diz "UNO!"',
+'log.caught':'{catcher} apanha {target}: +2 cartas!','log.offlineSkip':'{name} está offline: vez saltada.',
+'log.roundClosed':'{name} fecha a mão: +{pts} pontos.','log.reconnected':'{name} voltou.',
+'log.reshuffled':'Baralho reembaralhado.','log.notResponding':'{name} não responde.','log.tookOver':'{name} assume o jogo.',
+'err.mustRespond':'tens de responder com um {type} ou comprar {n}','err.notPlayable':'carta não jogável',
+'err.stillHaveColor':'ainda tens cartas {color}: não podes jogar Compra Quatro',
+'err.haveOtherPlayable':'tens outras cartas jogáveis: guarda o Muda Cor para quando estiveres bloqueado',
+'err.notActive':'jogo não ativo','err.notYourTurn':'não é a tua vez','err.noSuchCard':'carta inexistente',
+'err.onlyDrawnCard':'só podes jogar a carta que acabaste de comprar','err.alreadyDrew':'já compraste',
+'err.deckEmpty':'baralho esgotado','err.mustDrawFirst':'tens de comprar primeiro','err.unknownPlayer':'jogador desconhecido',
+'err.tooManyForOne':'tens demasiadas cartas para dizer UNO','err.nothingToCatch':'nada para apanhar','err.no':'não',
+'default.hostName':'Anfitrião','default.guestName':'Convidado','default.anon':'Anónimo','join.reenterPassword':'Introduz novamente a senha para voltar a entrar.'
+}
+};
+function detectLang(){
+  const saved=recall('uct_lang');
+  if(saved&&I18N[saved]) return saved;
+  const nav=((navigator.language||navigator.userLanguage||'en')+'').slice(0,2).toLowerCase();
+  return I18N[nav]?nav:'en';
+}
+let LANG=detectLang();
+function t(key,vars){
+  let s=(I18N[LANG]&&I18N[LANG][key]!=null)?I18N[LANG][key]:(I18N.en[key]!=null?I18N.en[key]:key);
+  if(vars) for(const k in vars) s=s.split('{'+k+'}').join(vars[k]);
+  return s;
+}
+function tn(base,n,vars){ return t(n===1?base+'.one':base+'.other', Object.assign({n},vars||{})); }
+function colorName(c){ return t('color.'+c); }
+function kindName(v){ return v==='skip'?t('card.skip'):v==='rev'?t('card.reverse'):v==='+2'?t('card.drawtwo'):v; }
+function cardFullName(card){
+  if(!card) return '';
+  return card.c==='w' ? (card.v==='+4'?t('card.drawfour'):t('card.wild')) : colorName(card.c)+' '+kindName(card.v);
+}
+// i log e gli errori di rete arrivano come {k,p} grezzi: si traducono qui,
+// sul dispositivo di chi guarda, non su quello che li ha generati
+function renderMsg(m){
+  if(!m) return '';
+  if(typeof m==='string') return t(m);
+  let p=m.p||{};
+  if(m.k==='log.play'||m.k==='log.playWild') p=Object.assign({},p,{card:cardFullName(p.card)});
+  if(m.k==='log.playWild'||m.k==='err.stillHaveColor') p=Object.assign({},p,{color:colorName(p.color)});
+  return t(m.k,p);
+}
+function applyI18n(root){
+  const r=root||document;
+  r.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=t(el.getAttribute('data-i18n')); });
+  r.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML=t(el.getAttribute('data-i18n-html')); });
+  r.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder=t(el.getAttribute('data-i18n-ph')); });
+  if(!root){ document.title=t('app.title'); document.documentElement.lang=LANG; }
+}
+function setLang(l){
+  if(!I18N[l]||l===LANG) return;
+  LANG=l; keep('uct_lang',l);
+  applyI18n();
+  if(VIEW){ VIEW.phase==='lobby'?renderLobby():renderAll(); }
+  else if(G){ renderLobby(); }
+  if(NET) status();
+}
+function initLangSel(){
+  const sel=$('#langsel'); sel.innerHTML='';
+  LANGS.forEach(l=>{ const o=document.createElement('option'); o.value=l; o.textContent=LANGNAMES[l]; sel.appendChild(o); });
+  sel.value=LANG;
+  sel.onchange=()=>setLang(sel.value);
+}
 
 /* ------------------------------------------------------------------- QR --
    Encoder byte-mode, ECC livello L, versioni 1..9. Nessuna dipendenza.     */
@@ -589,9 +1032,9 @@ class Net{
   }
   transport(){
     const l=[...this.links.values()];
-    if(!l.length) return 'in attesa';
+    if(!l.length) return t('status.waiting');
     return l.some(x=>x.mode==='p2p')
-      ? (l.every(x=>x.mode==='p2p')?'P2P diretto':'misto P2P/relay') : 'relay cifrato';
+      ? (l.every(x=>x.mode==='p2p')?t('status.p2pDirect'):t('status.p2pMixed')) : t('status.relay');
   }
   async _keys(){
     this.kp=await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},false,['deriveKey']);
@@ -613,7 +1056,7 @@ class Net{
       this.rehello();
       // nessuna risposta = password sbagliata, codice errato, o host assente
       this._join=setTimeout(()=>{ if(!this.links.size)
-        this.onfail('Nessuna risposta. Controlla codice e password, oppure l\'host non è in linea.');
+        this.onfail('err.noResponseHost');
       },14000);
     }
   }
@@ -725,7 +1168,6 @@ class Net{
    Punti : numeri = valore, azioni = 20, jolly = 50. Si arriva a 500.       */
 const COLORS=['r','g','b','y'];
 const LBL={skip:'⊘',rev:'⇄','+2':'+2',wild:'★','+4':'+4'};
-const CNAME={r:'Rosso',g:'Verde',b:'Blu',y:'Giallo'};
 
 function buildDeck(){
   const d=[];
@@ -773,28 +1215,28 @@ class Game{
      vedrebbe carte accese che poi l'host rifiuta.                          */
   whyNot(p,c){
     if(!legal(c,this.top(),this.color,this.stack,this.stackType))
-      return this.stack>0 ? ('devi rispondere con un '+this.stackType+' o pescare '+this.stack)
-                          : 'carta non giocabile';
+      return this.stack>0 ? {k:'err.mustRespond',p:{type:this.stackType,n:this.stack}}
+                          : {k:'err.notPlayable'};
     if(this.stack===0&&c.v==='+4'&&this.strict4&&p.hand.some(x=>x.c===this.color))
-      return 'hai ancora carte '+CNAME[this.color]+': non puoi giocare il Pesca Quattro';
+      return {k:'err.stillHaveColor',p:{color:this.color}};
     if(this.stack===0&&c.v==='wild'&&this.strictW&&
        p.hand.some(x=>x.c!=='w'&&playable(x,this.top(),this.color)))
-      return 'hai altre carte giocabili: il Cambia Colore si tiene per quando sei bloccato';
+      return {k:'err.haveOtherPlayable'};
     return null;
   }
   add(id,name){
     const same=this.P.find(p=>p.id===id);
     if(same){
       // stesso dispositivo che torna dopo un buco di rete: si riattiva
-      if(!same.conn){ same.conn=true; this.say(same.name+' è rientrato.'); }
+      if(!same.conn){ same.conn=true; this.say('log.reconnected',{name:same.name}); }
       return;
     }
-    const nm=(name||'Anon');
+    const nm=(name||t('default.anon'));
     const seat=this.P.find(p=>!p.conn&&p.name===nm);
     if(seat){                       // rientro: si riprende lo stesso posto
       const old=seat.id; seat.id=id; seat.conn=true;
       if(this.pending&&this.pending.id===old) this.pending.id=id;
-      this.say(nm+' è rientrato.');
+      this.say('log.reconnected',{name:nm});
       return;
     }
     if(this.phase!=='lobby') return;   // a partita iniziata non entra nessuno
@@ -802,7 +1244,9 @@ class Game{
     this.P.push({id,name:nm,hand:[],score:0,said:false,conn:true});
   }
   drop(id){ const p=this.P.find(x=>x.id===id); if(p) p.conn=false; }
-  say(t){ this.log.push(t); if(this.log.length>10) this.log.shift(); }
+  // {k,p}: chiave + parametri grezzi, non testo già formattato — si traduce
+  // lato client, così ogni giocatore lo legge nella propria lingua
+  say(k,p){ this.log.push({k,p}); if(this.log.length>10) this.log.shift(); }
 
   startRound(){
     this.deck=buildDeck(); this.discard=[]; this.stack=0; this.stackType=null;
@@ -815,16 +1259,16 @@ class Game{
     this.first = this.first===undefined ? 0 : (this.first+1)%this.P.length;
     this.turn = this.first;
     const opener=this.P[this.turn];
-    this.say('Nuova mano. Inizia '+opener.name+'.');
-    if(first.v==='skip'){ this.say(opener.name+' salta il turno.'); this.next(); }
+    this.say('log.newRound',{name:opener.name});
+    if(first.v==='skip'){ this.say('log.skipTurn',{name:opener.name}); this.next(); }
     else if(first.v==='rev'){
       this.dir=-1;
       this.turn=(this.first-1+this.P.length)%this.P.length;
-      this.say('Si parte al contrario.');
+      this.say('log.reverseStart');
     }
     else if(first.v==='+2'){
-      if(this.stackRule){ this.stack=2; this.stackType='+2'; this.say('Pesca Due iniziale: 2 in canna.'); }
-      else { this.give(opener,2); this.say(opener.name+' pesca 2 e salta.'); this.next(); }
+      if(this.stackRule){ this.stack=2; this.stackType='+2'; this.say('log.stackStart',{n:2}); }
+      else { this.give(opener,2); this.say('log.drawAndSkip',{name:opener.name,n:2}); this.next(); }
     }
     this.skipDead();
   }
@@ -852,15 +1296,15 @@ class Game{
     if(n>0) p.said=false; }
 
   play(id,idx,chosen){
-    if(this.phase!=='play') return 'partita non attiva';
+    if(this.phase!=='play') return {k:'err.notActive'};
     const p=this.cur();
-    if(p.id!==id) return 'non è il tuo turno';
+    if(p.id!==id) return {k:'err.notYourTurn'};
     const card=p.hand[idx];
-    if(!card) return 'carta inesistente';
+    if(!card) return {k:'err.noSuchCard'};
     if(this.pending&&this.pending.id!==id) this.pending=null;
     // idx -1 = dopo la pescata sei libero di giocare qualsiasi carta
     if(this.pending&&this.pending.idx!==-1&&this.pending.idx!==idx)
-      return 'puoi giocare solo la carta appena pescata';
+      return {k:'err.onlyDrawnCard'};
     const no=this.whyNot(p,card);
     if(no) return no;
 
@@ -868,28 +1312,29 @@ class Game{
     this.pending=null;
     this.discard.push(card);
     this.color = card.c==='w' ? (COLORS.includes(chosen)?chosen:'r') : card.c;
-    this.say(p.name+' gioca '+this.cardName(card)+(card.c==='w'?' → '+CNAME[this.color]:''));
+    if(card.c==='w') this.say('log.playWild',{name:p.name,card,color:this.color});
+    else this.say('log.play',{name:p.name,card});
 
     if(p.hand.length===0){ this.endRound(p); return null; }
     if(p.hand.length!==1) p.said=false;
 
     // "in due" conta chi è davvero al tavolo, non i posti occupati
     const two=this.activeCount()===2;
-    if(card.v==='skip'){ this.say(this.peek().name+' salta il turno.'); this.next(2); }
+    if(card.v==='skip'){ this.say('log.skipTurn',{name:this.peek().name}); this.next(2); }
     else if(card.v==='rev'){
-      if(two) this.say('Inverti: in due vale come salta.');
-      else { this.dir*=-1; this.say('Senso invertito.'); }
+      if(two) this.say('log.reverseAsSkip');
+      else { this.dir*=-1; this.say('log.reverseChanged'); }
       this.next(two?2:1);
     }
     else if(card.v==='+2'||card.v==='+4'){
       const n=card.v==='+2'?2:4;
       if(this.stackRule){
         this.stack+=n; this.stackType=card.v;
-        this.say('In canna: '+this.stack+' carte da pescare.');
+        this.say('log.stackAdd',{n:this.stack});
         this.next();
       } else {
         const t=this.peek(); this.give(t,n);
-        this.say(t.name+' pesca '+n+' e salta.'); this.next(2);
+        this.say('log.drawAndSkip',{name:t.name,n}); this.next(2);
       }
     }
     else this.next();
@@ -897,20 +1342,20 @@ class Game{
     return null;
   }
   draw(id){
-    if(this.phase!=='play') return 'partita non attiva';
+    if(this.phase!=='play') return {k:'err.notActive'};
     const p=this.cur();
-    if(p.id!==id) return 'non è il tuo turno';
-    if(this.pending) return 'hai già pescato';
+    if(p.id!==id) return {k:'err.notYourTurn'};
+    if(this.pending) return {k:'err.alreadyDrew'};
     if(this.stack>0){                       // incassa le pescate accumulate
       const n=this.stack;
       this.give(p,n); this.stack=0; this.stackType=null;
-      this.say(p.name+' incassa '+n+' carte.');
+      this.say('log.drawStack',{name:p.name,n});
       this.next(); this.skipDead(); return null;
     }
     this.reshuffle();
-    if(!this.deck.length) return 'mazzo esaurito';
+    if(!this.deck.length) return {k:'err.deckEmpty'};
     p.hand.push(this.deck.shift()); p.said=false;
-    this.say(p.name+' pesca.');
+    this.say('log.draw',{name:p.name});
     const last=p.hand.length-1;
     if(this.freeDraw){
       // qualsiasi carta giocabile va bene, non solo quella appena pescata
@@ -921,22 +1366,22 @@ class Game{
     this.next(); this.skipDead(); return null;
   }
   pass(id){
-    if(this.phase!=='play') return 'partita non attiva';
+    if(this.phase!=='play') return {k:'err.notActive'};
     const p=this.cur();
-    if(p.id!==id) return 'non è il tuo turno';
-    if(!this.pending) return 'devi prima pescare';
-    this.pending=null; this.say(p.name+' passa.'); this.next(); this.skipDead(); return null;
+    if(p.id!==id) return {k:'err.notYourTurn'};
+    if(!this.pending) return {k:'err.mustDrawFirst'};
+    this.pending=null; this.say('log.pass',{name:p.name}); this.next(); this.skipDead(); return null;
   }
   callOne(id){
-    const p=this.P.find(x=>x.id===id); if(!p) return 'giocatore ignoto';
-    if(p.hand.length>2) return 'hai troppe carte per dire 1';
-    p.said=true; this.say(p.name+' dice "UNO!"'); return null;
+    const p=this.P.find(x=>x.id===id); if(!p) return {k:'err.unknownPlayer'};
+    if(p.hand.length>2) return {k:'err.tooManyForOne'};
+    p.said=true; this.say('log.sayOne',{name:p.name}); return null;
   }
   catchPlayer(id,target){
     const c=this.P.find(x=>x.id===id), t=this.P.find(x=>x.id===target);
-    if(!c||!t||c===t) return 'no';
-    if(t.hand.length!==1||t.said) return 'niente da beccare';
-    this.give(t,2); this.say(c.name+' becca '+t.name+': +2 carte!');
+    if(!c||!t||c===t) return {k:'err.no'};
+    if(t.hand.length!==1||t.said) return {k:'err.nothingToCatch'};
+    this.give(t,2); this.say('log.caught',{catcher:c.name,target:t.name});
     return null;
   }
   skipDead(){
@@ -944,7 +1389,7 @@ class Game{
     let g=0;
     while(this.P.length&&!this.cur().conn&&g++<this.P.length){
       if(this.stack>0){ this.give(this.cur(),this.stack); this.stack=0; this.stackType=null; }
-      this.say(this.cur().name+' è offline: turno saltato.'); this.pending=null; this.next();
+      this.say('log.offlineSkip',{name:this.cur().name}); this.pending=null; this.next();
     }
   }
   endRound(w){
@@ -952,13 +1397,8 @@ class Game{
     this.P.forEach(p=>{ if(p!==w) p.hand.forEach(c=>pts+=points(c)); });
     w.score+=pts; this.lastWinner=w.id;
     this.stack=0; this.stackType=null;
-    this.say(w.name+' chiude la mano: +'+pts+' punti.');
+    this.say('log.roundClosed',{name:w.name,pts});
     this.phase = w.score>=this.target ? 'gameover' : 'roundend';
-  }
-  cardName(c){
-    if(c.c==='w') return c.v==='+4'?'Pesca Quattro':'Cambia Colore';
-    const n={skip:'Salta',rev:'Inverti','+2':'Pesca Due'}[c.v];
-    return CNAME[c.c]+' '+(n||c.v);
   }
   view(id){
     const me=this.P.find(p=>p.id===id);
@@ -972,7 +1412,7 @@ class Game{
       strict4:this.strict4, strictW:this.strictW, freeDraw:this.freeDraw,
       host:this.hostId||null, epoch:this.epoch||0, handover:this.handover!==false,
       hand:me?me.hand:[], pending:(this.pending&&this.pending.id===id)?this.pending.idx:null,
-      log:this.log[this.log.length-1]||'', lastWinner:this.lastWinner||null
+      log:this.log[this.log.length-1]||null, lastWinner:this.lastWinner||null
     };
   }
 }
@@ -1030,20 +1470,20 @@ const ME={name:'',id:null,host:false,pass:''};
 let NET=null,G=null,VIEW=null,ROOM=null,lastSeq=0,lastHeard=0;
 
 const show=id=>document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
-function status(extra){
-  if(!NET){ $('#net').textContent=extra||'—'; return; }
+function status(extraKey){
+  if(!NET){ $('#net').textContent=extraKey?t(extraKey):'—'; return; }
   const n=NET.brokers;
-  let t=extra;
-  if(!t){
-    t=NET.transport();
+  let label=extraKey?t(extraKey):null;
+  if(!label){
+    label=NET.transport();
     // in solitaria contro i bot non sta aspettando nessuno: dirlo è fuorviante
     if(!NET.links.size&&G&&G.phase!=='lobby'&&G.P.every(p=>p.bot||p.id===ME.id))
-      t='partita locale';
+      label=t('status.localGame');
   }
-  $('#net').textContent=(n?n+(n===1?' canale':' canali'):'nessun canale')+' · '+t;
+  $('#net').textContent=(n?tn('status.channel',n):t('status.noChannel'))+' · '+label;
 }
 const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const toast=m=>{ $('#log').textContent='⚠ '+m; };
+const toast=m=>{ $('#log').textContent='⚠ '+renderMsg(m); };
 
 // forma da costruttore: 'stack' qui è l'opzione, non il contatore di Game
 const lobbyRules=()=>({
@@ -1091,7 +1531,7 @@ function becomeHost(){
     if(!G||!ME.host) return;
     lastSeen.set(from,Date.now());
     const who=G.P.find(p=>p.id===from);
-    if(who&&!who.conn&&from!==ME.id){ who.conn=true; G.say(who.name+' è rientrato.'); }
+    if(who&&!who.conn&&from!==ME.id){ who.conn=true; G.say('log.reconnected',{name:who.name}); }
     if(msg.t==='ping'){ if(who&&!who.conn) pushAll(); return; }
     let err=null;
     if(msg.t==='join'){ G.add(from,msg.name); pushAll(); return; }
@@ -1127,7 +1567,7 @@ function becomeHost(){
     let changed=false;
     for(const p of G.P){
       if(p.bot||p.id===ME.id||!p.conn) continue;
-      if(now-(lastSeen.get(p.id)||0)>SILENCE){ p.conn=false; G.say(p.name+' non risponde.'); changed=true; }
+      if(now-(lastSeen.get(p.id)||0)>SILENCE){ p.conn=false; G.say('log.notResponding',{name:p.name}); changed=true; }
     }
     if(changed){ G.skipDead(); pushAll(); }
   },4000);
@@ -1153,7 +1593,7 @@ function promote(){
   for(const id of [...NET.links.keys()]) NET._drop(id);
   G=g; curEpoch=g.epoch; backup=null; hostGone=0;
   becomeHost();
-  G.say(ME.name+' prende in mano la partita.');
+  G.say('log.tookOver',{name:ME.name});
   G.skipDead();
   NET._pub({t:'newhost',from:NET.me,epoch:G.epoch});
   pushAll();
@@ -1171,7 +1611,7 @@ function demote(){
   ensureGuestLoops();
   lastSeq=0; lastHeard=Date.now();
   NET.rehello();
-  toast('Un altro giocatore ha preso in mano la partita: ti ricolleghi.');
+  toast('info.tookOverReconnect');
 }
 function onNewHost(m){
   if((m.epoch||0)<=curEpoch) return;
@@ -1179,7 +1619,7 @@ function onNewHost(m){
   if(ME.host){ demote(); return; }
   for(const id of [...NET.links.keys()]) if(id!==m.from) NET._drop(id);
   backup=null; hostGone=0; lastSeq=0; lastHeard=Date.now();
-  status('nuovo host, ricollegamento…');
+  status('status.newHostReconnecting');
   NET.rehello();
 }
 
@@ -1249,7 +1689,7 @@ $('#bot-level').onclick=()=>{
   botLevel=LEVELS[(LEVELS.indexOf(botLevel)+1)%3];
   keep('uct_botlv',botLevel);
   if(G) G.P.forEach(p=>{ if(p.bot) p.level=botLevel; });
-  $('#bot-level').textContent=botLevel;
+  $('#bot-level').textContent=t('level.'+botLevel);
   if(G) pushAll();
 };
 function guestInit(){
@@ -1260,8 +1700,8 @@ function guestInit(){
     NET=null;
     // si torna dove si era entrati, con la password già nel campo da correggere
     if(ROOM){ $('#joinroom').textContent=ROOM; $('#jpass').value=ME.pass||'';
-      $('#joinerr').textContent=m; show('sc-join'); }
-    else { $('#homeerr').textContent=m; show('sc-home'); }
+      $('#joinerr').textContent=t(m); show('sc-join'); }
+    else { $('#homeerr').textContent=t(m); show('sc-home'); }
   };
   ensureGuestLoops();
 }
@@ -1285,7 +1725,7 @@ function ensureGuestLoops(){
     // Siamo noi offline? Allora NON si subentra: il problema potremmo essere
     // noi, e prendere la partita vorrebbe dire riportarla indietro alla nostra
     // copia vecchia, buttando le mosse fatte dagli altri nel frattempo.
-    if(!NET.pool.healthy()){ wasOnline=false; status('sei offline'); return; }
+    if(!NET.pool.healthy()){ wasOnline=false; status('status.youOffline'); return; }
     if(!wasOnline){
       // appena tornati: si cerca l'host attuale invece di dichiararlo morto
       wasOnline=true; lastHeard=now;
@@ -1294,7 +1734,7 @@ function ensureGuestLoops(){
       NET.rehello(); return;
     }
     const silent=now-lastHeard;
-    if(silent>12000) status('host non raggiungibile');
+    if(silent>12000) status('status.hostUnreachable');
     if(VIEW.phase==='lobby'||VIEW.handover===false||!backup) return;
     // chi subentra lo decide l'ordine al tavolo: tutti arrivano alla stessa risposta
     const rank=successorsOf(VIEW.players,VIEW.host).indexOf(ME.id);
@@ -1323,7 +1763,7 @@ function setGuestHandlers(){
 }
 function act(o){
   if(ME.host) NET.ondata(ME.id,o);
-  else{ const h=[...NET.links.keys()][0]; if(h) NET.send(h,o); else toast('non sei connesso all\'host'); }
+  else{ const h=[...NET.links.keys()][0]; if(h) NET.send(h,o); else toast('err.notConnected'); }
 }
 
 function cardEl(c,cls){
@@ -1362,19 +1802,19 @@ function renderLobby(){
   ps.forEach(p=>{
     const r=document.createElement('div'); r.className='prow';
     r.innerHTML='<span class="dot'+(p.conn===false?' off':'')+'"></span>'+esc(p.name)+
-      (p.id===ME.id?'<span class="tag">tu</span>':(p.bot?'<span class="tag">computer</span>':''));
+      (p.id===ME.id?'<span class="tag">'+t('lobby.youTag')+'</span>':(p.bot?'<span class="tag">'+t('lobby.computerTag')+'</span>':''));
     L.appendChild(r);
   });
   $('#opts').style.display=ME.host?'flex':'none';
   $('#b-start').style.display=ME.host?'block':'none';
   $('#b-start').disabled=ps.length<2;
   $('#botn').textContent=String(ps.filter(p=>p.bot).length);
-  $('#bot-level').textContent=botLevel;
+  $('#bot-level').textContent=t('level.'+botLevel);
   $('#lobbyhint').textContent = ME.host
     ? (ps.length<2
-        ? 'Aspetta qualcuno, oppure aggiungi un avversario del computer e gioca subito.'
-        : 'Da 2 a 10 giocatori.')
-    : 'In attesa che l\'host inizi…';
+        ? t('lobby.hintWaitPlayers')
+        : t('lobby.hint2to10'))
+    : t('lobby.hintWaitHost');
 }
 const setText=(sel,t)=>{ const e=$(sel); if(e.textContent!==t) e.textContent=t; };
 let lastTop=null, lastOpp=[], lastActions=null, lastScores=null;
@@ -1386,7 +1826,7 @@ function renderOpps(){
   const O=$('#opps');
   const sigs=VIEW.players.map(p=>{
     const catchable = p.n===1&&!p.said&&p.id!==VIEW.you&&VIEW.phase==='play';
-    return [p.id,p.name,p.n,p.score,p.conn!==false,p.id===VIEW.turn,catchable].join('|');
+    return [p.id,p.name,p.n,p.score,p.conn!==false,p.id===VIEW.turn,catchable,LANG].join('|');
   });
   if(O.children.length!==sigs.length){ O.innerHTML=''; lastOpp=[]; }
   sigs.forEach((sig,i)=>{
@@ -1396,10 +1836,10 @@ function renderOpps(){
     const isNew=!O.children[i];
     const d=isNew?document.createElement('div'):O.children[i];
     d.className='opp'+(p.id===VIEW.turn?' turn':'')+(p.conn===false?' off':'');
-    d.innerHTML='<div class="nm">'+(p.id===VIEW.you?'Tu':esc(p.name))+'</div>'+
+    d.innerHTML='<div class="nm">'+(p.id===VIEW.you?t('game.you'):esc(p.name))+'</div>'+
       '<div class="cnt">'+p.n+'</div>'+stackHTML(p.n)+
-      '<div class="sc">'+p.score+' pt</div>'+
-      (catchable?'<span class="bang">becca!</span>':'');
+      '<div class="sc">'+t('game.pts',{n:p.score})+'</div>'+
+      (catchable?'<span class="bang">'+t('game.catchBang')+'</span>':'');
     d.onclick = catchable ? ()=>act({t:'catch',id:p.id}) : null;
     if(isNew) O.appendChild(d);
   });
@@ -1418,32 +1858,32 @@ function renderAll(){
     const D=$('#discard'); D.innerHTML='';
     if(VIEW.top) D.appendChild(cardEl(VIEW.top));
   }
-  setText('#deckn',VIEW.deck+' carte');
+  setText('#deckn',tn('game.deckCount',VIEW.deck));
   $('#swatch').style.background='var(--'+VIEW.color+')';
   const dh = VIEW.stack>0
-    ? '<span class="stackbadge">+'+VIEW.stack+' in canna</span>'
-    : (VIEW.dir===1?'senso orario ↻':'senso antiorario ↺');
+    ? '<span class="stackbadge">'+t('game.stackBadge',{n:VIEW.stack})+'</span>'
+    : (VIEW.dir===1?t('game.clockwise'):t('game.counterclockwise'));
   if($('#dirn').innerHTML!==dh) $('#dirn').innerHTML=dh;
-  setText('#log',VIEW.log||'');
+  setText('#log',renderMsg(VIEW.log));
 
   const mine = VIEW.turn===VIEW.you && VIEW.phase==='play';
   setText('#mystatus', !mine ? ''
-    : (VIEW.pending!==null ? 'Gioca la carta pescata o passa'
-    : VIEW.stack>0 ? ('Rispondi con un '+VIEW.stackType+' o pesca '+VIEW.stack)
-    : 'Tocca a te'));
+    : (VIEW.pending!==null ? t('game.playDrawnOrPass')
+    : VIEW.stack>0 ? t('game.respondOrDraw',{type:VIEW.stackType,n:VIEW.stack})
+    : t('game.yourTurn')));
 
   renderHand(mine);
 
   // anche i pulsanti si rifanno solo se cambiano: sfarfallavano a ogni stato
-  const asig=[VIEW.phase,mine,VIEW.pending,VIEW.stack,VIEW.hand.length<=2].join('|');
+  const asig=[VIEW.phase,mine,VIEW.pending,VIEW.stack,VIEW.hand.length<=2,LANG].join('|');
   if(asig!==lastActions){
     lastActions=asig;
     const A=$('#actions'); A.innerHTML='';
     if(VIEW.phase==='play'){
       if(mine&&VIEW.pending===null)
-        A.appendChild(btn(VIEW.stack>0?('Pesca '+VIEW.stack):'Pesca',()=>act({t:'draw'})));
-      if(mine&&VIEW.pending!==null) A.appendChild(btn('Passa',()=>act({t:'pass'}),'sec'));
-      if(VIEW.hand.length<=2) A.appendChild(btn('UNO !',()=>act({t:'one'}),'sec'));
+        A.appendChild(btn(VIEW.stack>0?t('game.drawN',{n:VIEW.stack}):t('game.draw'),()=>act({t:'draw'})));
+      if(mine&&VIEW.pending!==null) A.appendChild(btn(t('game.passBtn'),()=>act({t:'pass'}),'sec'));
+      if(VIEW.hand.length<=2) A.appendChild(btn(t('game.unoBtn'),()=>act({t:'one'}),'sec'));
     }
   }
   $('#deck').onclick=()=>{ if(mine&&VIEW.pending===null) act({t:'draw'}); };
@@ -1456,8 +1896,6 @@ function renderAll(){
    Nel ventaglio il primo tocco alza la carta, il secondo la gioca: con le
    carte sovrapposte giocare al primo tocco sarebbe una roulette.           */
 const VIEWS=['fan','fila','griglia'];
-// niente emoji nelle etichette: su alcuni dispositivi diventa un quadratino
-const VIEWLBL={fan:'◗ Ventaglio',fila:'▤ Fila',griglia:'▦ Griglia'};
 let handView=recall('uct_view')||'fan';
 let hints=recall('uct_hints')!=='0';
 let selIdx=null;
@@ -1516,9 +1954,9 @@ function renderHand(mine){
   if(handView==='fan') layoutFan(H);
   else list.forEach(el=>{ if(el.style.transform){ el.style.transform=''; el.style.zIndex=''; } });
 
-  const vl=VIEWLBL[handView];
+  const vl=t('view.'+handView);
   if($('#b-view').textContent!==vl) $('#b-view').textContent=vl;
-  const hl=hints?'◉ Aiuti: sì':'○ Aiuti: no';
+  const hl=t(hints?'hints.on':'hints.off');
   if($('#b-hint').textContent!==hl) $('#b-hint').textContent=hl;
   $('#b-hint').classList.toggle('on',hints);
 }
@@ -1600,7 +2038,7 @@ addEventListener('resize',()=>{ if(VIEW&&handView==='fan') layoutFan($('#hand'))
 
 function pickColor(i){
   const ov=$('#ov'), p=$('#ovpanel');
-  p.innerHTML='<h2>Scegli il colore</h2><div class="colorpick"></div>';
+  p.innerHTML='<h2>'+t('overlay.chooseColor')+'</h2><div class="colorpick"></div>';
   const g=p.querySelector('.colorpick');
   COLORS.forEach(c=>{
     const d=document.createElement('div'); d.className='cp';
@@ -1613,23 +2051,23 @@ function pickColor(i){
 function showScores(){
   const ov=$('#ov'), p=$('#ovpanel'), over=VIEW.phase==='gameover';
   // il tabellone si ridisegna solo se cambiano i punteggi, non a ogni keepalive
-  const sig=[VIEW.phase,VIEW.lastWinner,VIEW.players.map(x=>x.id+':'+x.score).join(',')].join('|');
+  const sig=[VIEW.phase,VIEW.lastWinner,VIEW.players.map(x=>x.id+':'+x.score).join(','),LANG].join('|');
   if(sig===lastScores){ ov.classList.add('on'); return; }
   lastScores=sig;
   const w=VIEW.players.find(x=>x.id===VIEW.lastWinner);
-  p.innerHTML='<h2>'+(over?'🏆 Partita finita':'Mano conclusa')+'</h2>'+
-    '<div class="muted" style="margin:0 auto">'+(w?esc(w.name)+(over?' vince la partita.':' chiude la mano.'):'')+'</div>'+
+  p.innerHTML='<h2>'+(over?t('overlay.gameOver'):t('overlay.roundEnd'))+'</h2>'+
+    '<div class="muted" style="margin:0 auto">'+(w?t(over?'overlay.winnerGame':'overlay.winnerRound',{name:esc(w.name)}):'')+'</div>'+
     '<table class="scoretab">'+VIEW.players.slice().sort((a,b)=>b.score-a.score)
       .map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+x.score+'</td></tr>').join('')+'</table>';
   if(ME.host){
-    const b=btn(over?'Nuova partita':'Mano successiva',()=>{
+    const b=btn(over?t('overlay.newGame'):t('overlay.nextRound'),()=>{
       if(over) G.P.forEach(x=>x.score=0);
       G.startRound(); pushAll();
     });
     b.style.cssText='margin-top:16px;width:100%'; p.appendChild(b);
   }else{
     const d=document.createElement('div'); d.className='muted';
-    d.style.marginTop='14px'; d.textContent='In attesa dell\'host…'; p.appendChild(d);
+    d.style.marginTop='14px'; d.textContent=t('overlay.waitingHost'); p.appendChild(d);
   }
   ov.classList.add('on');
 }
@@ -1657,12 +2095,12 @@ async function go(room,pass,isHost){
   $('#homeerr').textContent=''; $('#joinerr').textContent='';
   keep('uct_nick',ME.name);
   NET=new Net(room,pass,isHost); NET.onstatus=status;
-  status('connessione…');
+  status('status.connecting');
   if(isHost) hostInit(); else guestInit();
   try{ await NET.start(); }
   catch(e){
     NET=null;
-    const msg='Nessun canale raggiungibile. Rete bloccata o sei offline?';
+    const msg=t('err.noChannel');
     if(isHost){ $('#homeerr').textContent=msg; show('sc-home'); }
     else { $('#joinroom').textContent=room; $('#joinerr').textContent=msg; show('sc-join'); }
     return;
@@ -1684,7 +2122,7 @@ const genPass=()=>rid(4);
 $('#createpass').value=genPass();
 
 $('#b-create').onclick=()=>{
-  ME.name=($('#nick').value||'Host').trim().slice(0,12);
+  ME.name=($('#nick').value||t('default.hostName')).trim().slice(0,12);
   const p=($('#createpass').value||'').trim().toUpperCase()||genPass();
   $('#createpass').value=p;
   go(rid(6),p,true);
@@ -1692,9 +2130,9 @@ $('#b-create').onclick=()=>{
 $('#b-join').onclick=()=>{
   const c=($('#joincode').value||'').trim().toUpperCase();
   const p=($('#joinpass').value||'').trim().toUpperCase();
-  if(c.length<4){ $('#homeerr').textContent='Codice non valido.'; return; }
-  if(!p){ $('#homeerr').textContent='Serve la password della stanza.'; return; }
-  ME.name=($('#nick').value||'Ospite').trim().slice(0,12);
+  if(c.length<4){ $('#homeerr').textContent=t('err.invalidCode'); return; }
+  if(!p){ $('#homeerr').textContent=t('err.needPassword'); return; }
+  ME.name=($('#nick').value||t('default.guestName')).trim().slice(0,12);
   go(c,p,false);
 };
 $('#b-start').onclick=()=>{
@@ -1706,8 +2144,8 @@ $('#b-start').onclick=()=>{
 };
 $('#b-copy').onclick=async()=>{
   const u=inviteFinal()||inviteUrl(ROOM);
-  try{ await navigator.clipboard.writeText(u); $('#b-copy').textContent='Copiato ✓';
-    setTimeout(()=>$('#b-copy').textContent='Copia link invito',1500); }
+  try{ await navigator.clipboard.writeText(u); $('#b-copy').textContent=t('lobby.copied');
+    setTimeout(()=>$('#b-copy').textContent=t('lobby.copyBtn'),1500); }
   catch(e){ prompt('Copia questo link:',u); }
 };
 window.addEventListener('beforeunload',()=>{ if(NET) NET.bye(); });
@@ -1726,13 +2164,15 @@ function openJoin(code,msg){
 }
 $('#b-join2').onclick=()=>{
   const p=($('#jpass').value||'').trim().toUpperCase();
-  if(!p){ $('#joinerr').textContent='Serve la password della stanza.'; return; }
-  ME.name=($('#jnick').value||'Ospite').trim().slice(0,12);
+  if(!p){ $('#joinerr').textContent=t('err.needPassword'); return; }
+  ME.name=($('#jnick').value||t('default.guestName')).trim().slice(0,12);
   go(ROOM,p,false);
 };
 $('#b-back').onclick=()=>{ ROOM=null; history.replaceState(null,'',location.pathname); show('sc-home'); };
 $('#jpass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#b-join2').click(); });
 
+initLangSel();
+applyI18n();
 (function(){
   const nick=recall('uct_nick'); if(nick) $('#nick').value=nick;
   const h=location.hash||'';
@@ -1743,11 +2183,11 @@ $('#jpass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#b-join2').cl
   const saved=recall('uct_room')===code ? recall('uct_pass') : '';
   // rientro in partita: nome nel link e password già sul dispositivo
   if(n&&saved){
-    ME.name=decodeURIComponent(n[1]).slice(0,12)||'Ospite';
+    ME.name=decodeURIComponent(n[1]).slice(0,12)||t('default.guestName');
     return go(code,saved,false);
   }
   if(n) $('#jnick').value=decodeURIComponent(n[1]).slice(0,12);
-  openJoin(code, n?'Reinserisci la password per rientrare.':'');
+  openJoin(code, n?t('join.reenterPassword'):'');
 })();
 </script>
 </body>
