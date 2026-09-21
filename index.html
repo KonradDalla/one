@@ -297,6 +297,7 @@ input[type=text]:focus{border-color:var(--y)}
     <div class="handtools">
       <button class="chip" id="b-view"></button>
       <button class="chip" id="b-hint"></button>
+      <button class="chip" id="b-invite" data-i18n="game.inviteBtn"></button>
     </div>
     <div class="hand fan" id="hand"></div>
   </div>
@@ -409,7 +410,10 @@ it:{
 'err.onlyDrawnCard':'puoi giocare solo la carta appena pescata','err.alreadyDrew':'hai già pescato',
 'err.deckEmpty':'mazzo esaurito','err.mustDrawFirst':'devi prima pescare','err.unknownPlayer':'giocatore ignoto',
 'err.tooManyForOne':'hai troppe carte per dire 1','err.nothingToCatch':'niente da beccare','err.no':'no',
-'default.hostName':'Host','default.guestName':'Ospite','default.anon':'Anonimo','join.reenterPassword':'Reinserisci la password per rientrare.'
+'default.hostName':'Host','default.guestName':'Ospite','default.anon':'Anonimo','join.reenterPassword':'Reinserisci la password per rientrare.',
+'game.inviteBtn':'⚲ Invita','overlay.inviteTitle':'Invita un altro giocatore',
+'overlay.inviteHint':'Se qualcuno si è disconnesso, può rientrare con questo codice e questa password, anche a partita in corso.',
+'misc.close':'Chiudi'
 },
 en:{
 'app.title':'One','app.tagline':'one against all',
@@ -473,7 +477,10 @@ en:{
 'err.onlyDrawnCard':'you can only play the card you just drew','err.alreadyDrew':'you already drew',
 'err.deckEmpty':'deck empty','err.mustDrawFirst':'you must draw first','err.unknownPlayer':'unknown player',
 'err.tooManyForOne':'you have too many cards to say UNO','err.nothingToCatch':'nothing to catch','err.no':'no',
-'default.hostName':'Host','default.guestName':'Guest','default.anon':'Anonymous','join.reenterPassword':'Re-enter the password to rejoin.'
+'default.hostName':'Host','default.guestName':'Guest','default.anon':'Anonymous','join.reenterPassword':'Re-enter the password to rejoin.',
+'game.inviteBtn':'⚲ Invite','overlay.inviteTitle':'Invite another player',
+'overlay.inviteHint':'If someone got disconnected, they can rejoin with this code and password, even mid-game.',
+'misc.close':'Close'
 },
 es:{
 'app.title':'One','app.tagline':'uno contra todos',
@@ -537,7 +544,10 @@ es:{
 'err.onlyDrawnCard':'solo puedes jugar la carta que acabas de robar','err.alreadyDrew':'ya has robado',
 'err.deckEmpty':'mazo agotado','err.mustDrawFirst':'primero tienes que robar','err.unknownPlayer':'jugador desconocido',
 'err.tooManyForOne':'tienes demasiadas cartas para decir UNO','err.nothingToCatch':'no hay nada que pillar','err.no':'no',
-'default.hostName':'Anfitrión','default.guestName':'Invitado','default.anon':'Anónimo','join.reenterPassword':'Vuelve a introducir la contraseña para reincorporarte.'
+'default.hostName':'Anfitrión','default.guestName':'Invitado','default.anon':'Anónimo','join.reenterPassword':'Vuelve a introducir la contraseña para reincorporarte.',
+'game.inviteBtn':'⚲ Invitar','overlay.inviteTitle':'Invita a otro jugador',
+'overlay.inviteHint':'Si alguien se ha desconectado, puede volver a entrar con este código y esta contraseña, incluso con la partida en curso.',
+'misc.close':'Cerrar'
 },
 fr:{
 'app.title':'One','app.tagline':'un contre tous',
@@ -601,7 +611,10 @@ fr:{
 'err.onlyDrawnCard':'tu ne peux jouer que la carte que tu viens de piocher','err.alreadyDrew':'tu as déjà pioché',
 'err.deckEmpty':'pioche épuisée','err.mustDrawFirst':'tu dois d\'abord piocher','err.unknownPlayer':'joueur inconnu',
 'err.tooManyForOne':'tu as trop de cartes pour dire UNO','err.nothingToCatch':'rien à attraper','err.no':'non',
-'default.hostName':'Hôte','default.guestName':'Invité','default.anon':'Anonyme','join.reenterPassword':'Ressaisis le mot de passe pour revenir.'
+'default.hostName':'Hôte','default.guestName':'Invité','default.anon':'Anonyme','join.reenterPassword':'Ressaisis le mot de passe pour revenir.',
+'game.inviteBtn':'⚲ Inviter','overlay.inviteTitle':'Invite un autre joueur',
+'overlay.inviteHint':'Si quelqu\'un a été déconnecté, il peut revenir avec ce code et ce mot de passe, même en pleine partie.',
+'misc.close':'Fermer'
 },
 de:{
 'app.title':'One','app.tagline':'einer gegen alle',
@@ -665,7 +678,10 @@ de:{
 'err.onlyDrawnCard':'du kannst nur die gerade gezogene Karte spielen','err.alreadyDrew':'du hast schon gezogen',
 'err.deckEmpty':'Stapel leer','err.mustDrawFirst':'du musst zuerst ziehen','err.unknownPlayer':'unbekannter Spieler',
 'err.tooManyForOne':'du hast zu viele Karten, um UNO zu sagen','err.nothingToCatch':'nichts zu erwischen','err.no':'nein',
-'default.hostName':'Host','default.guestName':'Gast','default.anon':'Anonym','join.reenterPassword':'Gib das Passwort erneut ein, um wieder einzusteigen.'
+'default.hostName':'Host','default.guestName':'Gast','default.anon':'Anonym','join.reenterPassword':'Gib das Passwort erneut ein, um wieder einzusteigen.',
+'game.inviteBtn':'⚲ Einladen','overlay.inviteTitle':'Weiteren Spieler einladen',
+'overlay.inviteHint':'Falls jemand die Verbindung verloren hat, kann er mit diesem Code und Passwort wieder einsteigen, auch mitten im Spiel.',
+'misc.close':'Schließen'
 },
 pt:{
 'app.title':'One','app.tagline':'um contra todos',
@@ -729,7 +745,10 @@ pt:{
 'err.onlyDrawnCard':'só podes jogar a carta que acabaste de comprar','err.alreadyDrew':'já compraste',
 'err.deckEmpty':'baralho esgotado','err.mustDrawFirst':'tens de comprar primeiro','err.unknownPlayer':'jogador desconhecido',
 'err.tooManyForOne':'tens demasiadas cartas para dizer UNO','err.nothingToCatch':'nada para apanhar','err.no':'não',
-'default.hostName':'Anfitrião','default.guestName':'Convidado','default.anon':'Anónimo','join.reenterPassword':'Introduz novamente a senha para voltar a entrar.'
+'default.hostName':'Anfitrião','default.guestName':'Convidado','default.anon':'Anónimo','join.reenterPassword':'Introduz novamente a senha para voltar a entrar.',
+'game.inviteBtn':'⚲ Convidar','overlay.inviteTitle':'Convida outro jogador',
+'overlay.inviteHint':'Se alguém ficou desconectado, pode voltar a entrar com este código e senha, mesmo a meio do jogo.',
+'misc.close':'Fechar'
 }
 };
 function detectLang(){
@@ -2063,8 +2082,35 @@ $('#b-hint').onclick=()=>{
   hints=!hints; keep('uct_hints',hints?'1':'0');
   if(VIEW) renderAll();
 };
+$('#b-invite').onclick=showInviteOverlay;
 addEventListener('resize',()=>{ if(VIEW&&handView==='fan') layoutFan($('#hand')); });
 
+/* Il codice e la password restano visibili solo nella lobby: una volta
+   iniziata la mano, chi si disconnette non ha più modo di farseli ridire,
+   perché nessuno schermo li mostra più. Questo overlay li rende
+   raggiungibili in qualunque momento, anche a partita in corso.            */
+function showInviteOverlay(){
+  const ov=$('#ov'), p=$('#ovpanel');
+  const pass=ME.pass||recall('uct_pass')||'';
+  p.innerHTML='<h2>'+t('overlay.inviteTitle')+'</h2>'+
+    '<div class="muted" style="margin:10px auto 0">'+t('overlay.inviteHint')+'</div>'+
+    '<div class="code" style="margin:14px 0 6px">'+esc(ROOM||'')+'</div>'+
+    '<canvas id="ovqr" style="background:#fff;border-radius:12px;padding:8px;margin:0 auto;display:block"></canvas>'+
+    '<div class="pwbox" style="margin-top:12px"><span>'+t('lobby.pwNotInQr')+'</span><div class="pw">'+esc(pass)+'</div></div>';
+  const copyBtn=btn(t('lobby.copyBtn'),async()=>{
+    const u=inviteUrl(ROOM);
+    try{ await navigator.clipboard.writeText(u); copyBtn.textContent=t('lobby.copied');
+      setTimeout(()=>copyBtn.textContent=t('lobby.copyBtn'),1500); }
+    catch(e){ prompt(t('lobby.copyBtn')+':',u); }
+  },'sec');
+  copyBtn.style.cssText='margin-top:16px;width:100%';
+  p.appendChild(copyBtn);
+  const closeBtn=btn(t('misc.close'),()=>ov.classList.remove('on'),'sec');
+  closeBtn.style.cssText='margin-top:8px;width:100%';
+  p.appendChild(closeBtn);
+  ov.classList.add('on');
+  try{ drawQR($('#ovqr'), inviteUrl(ROOM), 4); }catch(e){}
+}
 function pickColor(i){
   const ov=$('#ov'), p=$('#ovpanel');
   p.innerHTML='<h2>'+t('overlay.chooseColor')+'</h2><div class="colorpick"></div>';
