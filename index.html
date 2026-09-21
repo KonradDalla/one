@@ -129,10 +129,11 @@ input[type=text]:focus{border-color:var(--y)}
 .card .cnr{position:absolute;font-size:11px;opacity:.92}
 .card .cnr.tl{top:3px;left:5px} .card .cnr.br{bottom:3px;right:5px;transform:rotate(180deg)}
 .card .cshape{position:absolute;top:4px;right:6px;font-size:10px;opacity:.85;text-shadow:0 1px 0 #0004}
+/* la dimensione segue --card-w (non un font-size fisso): resta proporzionata
+   alla LARGHEZZA della carta in ogni vista e ad ogni breakpoint, senza una
+   regola a parte per ciascuna. Più opaco di prima: sul rosso spariva.      */
 .card .cwatermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:54px;opacity:.15;color:#fff;pointer-events:none}
-.piles .card .cwatermark{font-size:68px}
-.hand.griglia .card .cwatermark{font-size:32px}
+  font-size:calc(var(--card-w) * .85);opacity:.24;color:#fff;pointer-events:none}
 /* nella griglia le carte sono piccole ma il simbolo per i daltonici deve
    restare: prima spariva del tutto proprio lì, sulle carte in mano.        */
 .hand.griglia .card .cshape{top:2px;right:3px;font-size:8px}
@@ -175,7 +176,7 @@ input[type=text]:focus{border-color:var(--y)}
 .hand.griglia::-webkit-scrollbar{display:none}
 .hand.griglia .card{--card-radius:8px;border-width:2px;border-radius:var(--card-radius);transition:transform .12s}
 .hand.griglia .card .big{font-size:28px}
-.hand.griglia .card .cnr{display:none}
+.hand.griglia .card .cnr{font-size:8px}
 .hand.griglia .card.ok{transform:translateY(-6px)}
 
 /* --- ventaglio: sovrapposte ad arco, si vede solo la punta --- */
