@@ -140,6 +140,10 @@ input[type=text]:focus{border-color:var(--y)}
 .card.r{background:var(--r)} .card.g{background:var(--g)}
 .card.b{background:var(--b)} .card.y{background:var(--y);color:#3b2f00}
 .card.w{background:conic-gradient(var(--r) 0 25%,var(--b) 0 50%,var(--y) 0 75%,var(--g) 0)}
+/* le due bianche vere: sfondo chiaro, non arcobaleno, altrimenti si perdono
+   in mezzo a Cambia Colore e Pesca Quattro a colpo d'occhio.               */
+.card.w.blank{background:var(--ink);color:#241d00}
+.card.w.blank .cnr{opacity:.75}
 .card.back{background:repeating-linear-gradient(45deg,#1b1b24,#1b1b24 6px,#262633 6px,#262633 12px)}
 .card.back::after{content:"1";font-size:27px;font-weight:900;color:#fff9;transform:rotate(-12deg)}
 .deckwrap{position:relative;cursor:pointer}
@@ -2029,7 +2033,10 @@ function act(o){
 
 function cardEl(c,cls){
   const d=document.createElement('div');
-  d.className='card '+c.c+(cls?' '+cls:'');
+  // le due carte bianche devono leggersi come bianche, non come jolly
+  // arcobaleno: altrimenti si confondono con Cambia Colore e Pesca Quattro
+  const blank=(c.v==='custom'||c.v==='shuffle')?' blank':'';
+  d.className='card '+c.c+blank+(cls?' '+cls:'');
   const l=LBL[c.v]||c.v, shape=CSHAPE[c.c];
   // la forma grande e sbiadita dietro al numero è la stessa usata per i
   // daltonici in un angolo: fa anche da "logo" della carta, senza scimmiottare
