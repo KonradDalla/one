@@ -1,0 +1,1756 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Uno Contro Tutti</title>
+<style>
+:root{
+  --r:#e4443a; --g:#3aa757; --b:#2b7fd4; --y:#e8b91f;
+  --felt:#143a2b; --felt2:#0b241b;
+  --ink:#f4f1e8; --dim:#94a49b;
+  --card-w:64px; --card-h:96px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  background:radial-gradient(ellipse at 50% 32%,var(--felt) 0%,var(--felt2) 68%,#061410 100%);
+  color:var(--ink);
+  font-family:ui-rounded,-apple-system,"Segoe UI",system-ui,sans-serif;
+  display:flex;flex-direction:column;overflow:hidden;
+  padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
+}
+.screen{display:none;flex:1;min-height:0;flex-direction:column}
+.screen.on{display:flex}
+h1.logo{
+  font-size:74px;line-height:.95;margin:0;font-weight:900;letter-spacing:-5px;
+  background:linear-gradient(135deg,var(--y),var(--r) 45%,var(--b) 85%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  transform:rotate(-7deg)
+}
+.sub{font-size:13px;letter-spacing:5px;text-transform:uppercase;color:var(--dim);margin-top:-2px}
+/* 'safe center' centra finché c'è spazio, ma quando il contenuto è più alto
+   dello schermo torna ad allinearsi in alto. Con il semplice 'center' la
+   parte iniziale finisce fuori dall'area scorrevole e non la raggiungi più. */
+.center{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;justify-content:safe center;
+  gap:14px;padding:22px;overflow-y:auto;overscroll-behavior:contain}
+#sc-lobby .center{gap:10px}
+#sc-lobby .center>*{flex:none}
+input,button{font-family:inherit;font-size:16px}
+input[type=text]{
+  background:#ffffff14;border:1px solid #ffffff2b;color:var(--ink);
+  padding:13px 16px;border-radius:12px;width:100%;max-width:300px;outline:none;text-align:center
+}
+input[type=text]:focus{border-color:var(--y)}
+.btn{
+  border:none;border-radius:14px;padding:14px 22px;font-weight:700;cursor:pointer;
+  background:var(--y);color:#241d00;width:100%;max-width:300px;transition:transform .08s
+}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:#ffffff1a;color:var(--ink);border:1px solid #ffffff2e}
+.btn.sm{width:auto;padding:9px 15px;font-size:14px;border-radius:11px}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.muted{color:var(--dim);font-size:13px;text-align:center;line-height:1.5;max-width:320px}
+.sep{color:var(--dim);font-size:12px;letter-spacing:2px}
+
+.code{font-size:34px;font-weight:900;letter-spacing:7px;color:var(--y)}
+.qrnote{width:172px;min-height:120px;display:flex;align-items:center;justify-content:center;
+  text-align:center;font-size:12px;line-height:1.6;color:var(--dim);
+  border:1px dashed #ffffff30;border-radius:12px;padding:14px}
+.pwbox{font-size:11px;color:var(--dim);text-align:center;line-height:1.5}
+.pw{font-size:26px;font-weight:900;letter-spacing:6px;color:var(--ink);
+  background:#ffffff14;border:1px dashed #ffffff33;border-radius:12px;padding:6px 14px;margin-top:4px}
+#qr{background:#fff;border-radius:12px;padding:8px;image-rendering:pixelated;width:156px;height:156px}
+/* l'elenco scorre dentro di sé: aggiungere giocatori non deve spingere
+   il QR fuori dallo schermo */
+.plist{display:flex;flex-direction:column;gap:6px;width:100%;max-width:300px;
+  max-height:168px;overflow-y:auto;scrollbar-width:none}
+.plist::-webkit-scrollbar{display:none}
+.prow{flex:none}
+.prow{display:flex;align-items:center;gap:10px;background:#ffffff12;padding:10px 13px;border-radius:11px;font-size:15px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--g);flex:none}
+.dot.off{background:#777}
+.tag{margin-left:auto;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.opts{width:100%;max-width:300px;display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--dim);cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--y);flex:none}
+.botrow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim);
+  border-top:1px solid #ffffff18;padding-top:10px;margin-top:2px}
+.botrow b{color:var(--ink);font-size:16px;min-width:14px;text-align:center}
+.botrow .chip{padding:4px 10px}
+.botrow #bot-minus,.botrow #bot-plus{font-size:16px;line-height:1;padding:3px 10px}
+
+/* il padding in alto lascia spazio all'indicatore dei canali, che è fisso
+   in alto a destra e altrimenti copre il quarto giocatore */
+.top{display:flex;gap:7px;padding:24px 10px 4px;overflow-x:auto;flex:none;scrollbar-width:none}
+.top::-webkit-scrollbar{display:none}
+.opp{background:#ffffff10;border:1.5px solid transparent;border-radius:13px;padding:8px 10px;
+  min-width:84px;flex:none;text-align:center;position:relative}
+.opp.turn{border-color:var(--y);background:#e8b91f22}
+.opp.off{opacity:.4}
+.opp .nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;margin:0 auto}
+.opp .cnt{font-size:20px;font-weight:900;margin-top:1px}
+.opp .sc{font-size:10px;color:var(--dim)}
+/* mazzetto di carte a ventaglio: dorso a righe, bordo bianco e rotazione,
+   altrimenti si leggono come barrette e non come carte */
+.stack{position:relative;height:27px;width:100%;margin:2px 0 1px}
+.stack i{position:absolute;bottom:1px;left:50%;width:12px;height:17px;
+  border-radius:2.5px;border:1px solid #ffffff70;transform-origin:50% 150%;
+  background:repeating-linear-gradient(45deg,#242430,#242430 2px,#37374a 2px,#37374a 4px);
+  box-shadow:-1px 1px 2px #0006}
+.stack.low i{border-color:#e8b91fcc}
+.stack.last i{background:linear-gradient(135deg,var(--y),#c69a0f);
+  border-color:#fff;box-shadow:0 0 9px #e8b91faa}
+.bang{position:absolute;top:-7px;right:-5px;background:var(--r);color:#fff;font-size:10px;
+  font-weight:900;padding:2px 6px;border-radius:9px;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.12)}}
+
+.table{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+/* il mazzo e la carta in tavola sono il punto in cui si guarda: più grandi */
+.piles{display:flex;align-items:center;gap:22px;margin-bottom:16px;--card-w:78px;--card-h:116px}
+.piles .card .big{font-size:36px}
+.piles .card .cnr{font-size:13px}
+.card{width:var(--card-w);height:var(--card-h);border-radius:10px;position:relative;
+  display:flex;align-items:center;justify-content:center;flex:none;
+  font-weight:900;color:#fff;box-shadow:0 5px 14px #0007;border:3px solid #fff;user-select:none}
+.card .big{font-size:29px;text-shadow:0 2px 0 #0003}
+.card .cnr{position:absolute;font-size:11px;opacity:.92}
+.card .cnr.tl{top:3px;left:5px} .card .cnr.br{bottom:3px;right:5px;transform:rotate(180deg)}
+.card.r{background:var(--r)} .card.g{background:var(--g)}
+.card.b{background:var(--b)} .card.y{background:var(--y);color:#3b2f00}
+.card.w{background:conic-gradient(var(--r) 0 25%,var(--b) 0 50%,var(--y) 0 75%,var(--g) 0)}
+.card.back{background:repeating-linear-gradient(45deg,#1b1b24,#1b1b24 6px,#262633 6px,#262633 12px)}
+.card.back::after{content:"1";font-size:27px;font-weight:900;color:#fff9;transform:rotate(-12deg)}
+.deckwrap{position:relative;cursor:pointer}
+.deckwrap .n{position:absolute;bottom:-17px;width:100%;text-align:center;font-size:11px;color:var(--dim)}
+.colorbar{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--dim)}
+.swatch{width:15px;height:15px;border-radius:5px;border:2px solid #fff6}
+.log{font-size:12px;color:var(--dim);height:16px;text-align:center;padding:0 16px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.dirn{font-size:12px;color:var(--dim)}
+.stackbadge{background:var(--r);color:#fff;font-size:13px;font-weight:900;padding:4px 11px;border-radius:10px}
+
+.handwrap{flex:none;padding:4px 0 8px}
+.actions{display:flex;gap:8px;justify-content:center;padding:0 10px 6px;flex-wrap:wrap;min-height:38px}
+.handtools{display:flex;gap:7px;justify-content:center;padding:0 10px 4px}
+.chip{background:#ffffff12;border:1px solid #ffffff22;color:var(--dim);font-size:11px;
+  padding:5px 11px;border-radius:20px;cursor:pointer;font-family:inherit}
+.chip.on{background:#e8b91f22;border-color:#e8b91f66;color:var(--y)}
+.hand .card{cursor:pointer}
+
+/* --- fila: tutte in orizzontale, si scorre --- */
+.hand.fila{display:flex;gap:6px;overflow-x:auto;padding:10px 14px 12px;scrollbar-width:none}
+.hand.fila::-webkit-scrollbar{display:none}
+.hand.fila .card{transition:transform .12s}
+.hand.fila .card.ok{transform:translateY(-9px)}
+
+/* --- griglia: tutte visibili insieme, carte piccole --- */
+.hand.griglia{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;
+  padding:8px 12px;max-height:168px;overflow-y:auto;scrollbar-width:none;
+  --card-w:48px;--card-h:72px}
+.hand.griglia::-webkit-scrollbar{display:none}
+.hand.griglia .card{border-width:2px;border-radius:8px;transition:transform .12s}
+.hand.griglia .card .big{font-size:21px}
+.hand.griglia .card .cnr{display:none}
+.hand.griglia .card.ok{transform:translateY(-6px)}
+
+/* --- ventaglio: sovrapposte ad arco, si vede solo la punta --- */
+/* overflow-x clip e non hidden: le punte in basso non vanno tagliate */
+.hand.fan{position:relative;display:block;height:158px;padding:0;
+  overflow:visible;overflow-x:clip;touch-action:none}
+/* durante lo scorrimento la transizione lunga strascica: si accorcia */
+.hand.fan.dragging .card{transition:transform .07s linear}
+.hand.fan .card{position:absolute;bottom:26px;left:50%;margin:0;
+  transform-origin:50% 115%;transition:transform .2s cubic-bezier(.2,.8,.3,1),box-shadow .2s;
+  box-shadow:-3px 4px 10px #0006}
+.hand.fan .card.sel{box-shadow:0 10px 26px #000a;z-index:99!important}
+.hand.fan .card.ok::after{content:"";position:absolute;inset:-3px;border-radius:10px;
+  box-shadow:0 0 0 2px var(--y);pointer-events:none}
+
+/* Le non giocabili si smorzano solo dove non rovinano la lettura: nel
+   ventaglio le carte si sovrappongono, e sbiadirle fa sembrare la mano rotta.
+   Lì basta l'anello giallo sulle giocabili.                                 */
+.hand.fila .card.no,.hand.griglia .card.no{opacity:.38}
+.hand.fan .card.no{opacity:.85}
+
+/* suggerimenti spenti: nessuna carta viene evidenziata */
+.hand.noaiuti .card.no{opacity:1}
+.hand.fan.noaiuti .card.ok::after{display:none}
+.hand.fila.noaiuti .card.ok,.hand.griglia.noaiuti .card.ok{transform:none}
+.mystatus{text-align:center;font-size:13px;font-weight:700;height:18px;color:var(--y)}
+
+.ov{position:fixed;inset:0;background:#000c;backdrop-filter:blur(7px);display:none;
+  align-items:center;justify-content:center;padding:24px;z-index:50}
+.ov.on{display:flex}
+.panel{background:#18291f;border:1px solid #ffffff1f;border-radius:20px;padding:24px;
+  width:100%;max-width:340px;text-align:center;max-height:85vh;overflow:auto}
+.panel h2{margin:0 0 6px;font-size:21px}
+.colorpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.cp{height:62px;border-radius:14px;border:3px solid #fff3;cursor:pointer}
+.scoretab{width:100%;font-size:14px;margin-top:12px;border-collapse:collapse}
+.scoretab td{padding:7px 4px;border-bottom:1px solid #ffffff14;text-align:left}
+.scoretab td:last-child{text-align:right;font-weight:900}
+.net{position:fixed;top:calc(4px + env(safe-area-inset-top));right:8px;font-size:10px;
+  color:var(--dim);background:#0006;padding:3px 7px;border-radius:7px;z-index:40}
+</style>
+</head>
+<body>
+
+<div class="net" id="net">—</div>
+
+<div class="screen on" id="sc-home">
+  <div class="center">
+    <h1 class="logo">1</h1>
+    <div class="sub">uno contro tutti</div>
+    <div class="muted">Niente account, niente installazione.<br>Crea una stanza, mostra il QR, si gioca.</div>
+    <input type="text" id="nick" maxlength="12" placeholder="Il tuo nome">
+    <input type="text" id="createpass" maxlength="16" placeholder="password stanza"
+           style="text-transform:uppercase;letter-spacing:3px">
+    <button class="btn" id="b-create">Crea una stanza</button>
+    <div class="sep">— oppure —</div>
+    <input type="text" id="joincode" maxlength="6" placeholder="CODICE" style="text-transform:uppercase">
+    <input type="text" id="joinpass" maxlength="16" placeholder="PASSWORD" style="text-transform:uppercase;letter-spacing:3px">
+    <button class="btn sec" id="b-join">Entra in una stanza</button>
+    <div class="muted" id="homeerr" style="color:var(--r)"></div>
+  </div>
+</div>
+
+<div class="screen" id="sc-join">
+  <div class="center">
+    <h1 class="logo" style="font-size:52px">1</h1>
+    <div class="muted">Stai entrando nella stanza</div>
+    <div class="code" id="joinroom">——————</div>
+    <input type="text" id="jnick" maxlength="12" placeholder="Il tuo nome">
+    <input type="text" id="jpass" maxlength="16" placeholder="PASSWORD"
+           style="text-transform:uppercase;letter-spacing:3px">
+    <button class="btn" id="b-join2">Entra</button>
+    <div class="muted" id="joinerr" style="color:var(--r)"></div>
+    <div class="muted">La password te la dice chi ha creato la stanza:<br>
+      è scritta sul suo schermo, sotto il QR.</div>
+    <button class="btn sec sm" id="b-back">Non è questa la stanza</button>
+  </div>
+</div>
+
+<div class="screen" id="sc-lobby">
+  <div class="center">
+    <div class="muted">Inquadra il QR o usa il codice</div>
+    <div class="code" id="roomcode">——————</div>
+    <canvas id="qr"></canvas>
+    <div class="qrnote" id="qrnote" style="display:none">
+      Qui non conosco il mio indirizzo pubblico.<br>
+      Incolla sotto il link della pagina e il QR compare.</div>
+    <div class="pwbox">la password non è nel QR: dilla a voce
+      <div class="pw" id="roompass">————</div></div>
+    <input type="text" id="invite" style="font-size:12px;padding:9px 12px"
+           placeholder="https://… (indirizzo pubblico della pagina)">
+    <button class="btn sec sm" id="b-copy">Copia link invito</button>
+    <div class="muted" id="framehint" style="display:none">
+      Stai guardando un'anteprima incorporata, quindi il link che vedi qui non
+      funziona dai telefoni. Apri la pagina al suo indirizzo pubblico, oppure
+      incollalo nel campo qui sopra: al codice stanza ci penso io.</div>
+    <div class="plist" id="lobbylist"></div>
+    <div class="opts" id="opts" style="display:none">
+      <label class="opt"><input type="checkbox" id="o-strict4" checked>
+        Pesca Quattro solo se non hai il colore <em>(ufficiale)</em></label>
+      <label class="opt"><input type="checkbox" id="o-strictw">
+        Cambia Colore solo se non puoi giocare altro</label>
+      <label class="opt"><input type="checkbox" id="o-freedraw" checked>
+        Dopo aver pescato puoi giocare qualsiasi carta</label>
+      <label class="opt"><input type="checkbox" id="o-stack">
+        Accumula le pescate (+2 su +2, +4 su +4)</label>
+      <label class="opt"><input type="checkbox" id="o-handover" checked>
+        Se l'host si stacca, un altro prende la partita</label>
+      <div class="botrow">
+        <span>Avversari del computer</span>
+        <button class="chip" id="bot-minus">−</button>
+        <b id="botn">0</b>
+        <button class="chip" id="bot-plus">+</button>
+        <button class="chip on" id="bot-level">normale</button>
+      </div>
+    </div>
+    <button class="btn" id="b-start">Inizia partita</button>
+    <div class="muted" id="lobbyhint"></div>
+  </div>
+</div>
+
+<div class="screen" id="sc-game">
+  <div class="top" id="opps"></div>
+  <div class="table">
+    <div class="dirn" id="dirn"></div>
+    <div class="piles">
+      <div class="deckwrap" id="deck"><div class="card back"></div><div class="n" id="deckn"></div></div>
+      <div id="discard"></div>
+    </div>
+    <div class="colorbar"><span>colore in gioco</span><span class="swatch" id="swatch"></span></div>
+    <div class="log" id="log"></div>
+  </div>
+  <div class="handwrap">
+    <div class="mystatus" id="mystatus"></div>
+    <div class="actions" id="actions"></div>
+    <div class="handtools">
+      <button class="chip" id="b-view">◗ Ventaglio</button>
+      <button class="chip" id="b-hint">Aiuti</button>
+    </div>
+    <div class="hand fan" id="hand"></div>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="panel" id="ovpanel"></div></div>
+
+<script>
+"use strict";
+/* ==========================================================================
+   Uno Contro Tutti — un solo file, nessun server proprio.
+
+   Signaling : MQTT 3.1.1 su WebSocket (broker pubblici, wss:443)
+   Trasporto : WebRTC DataChannel via STUN, con fallback su relay MQTT cifrato
+   Topologia : a stella — l'host è il server autoritativo del gioco
+   Crypto    : ECDH P-256 per coppia + AES-GCM sui messaggi in relay
+   ========================================================================== */
+
+const $ = s => document.querySelector(s);
+const rid = (n=8) => { let s=''; const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  for(let i=0;i<n;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; };
+const b64  = u => btoa(String.fromCharCode.apply(null, new Uint8Array(u)));
+const ub64 = s => Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+
+/* Preferenze e password della stanza restano sul dispositivo per il rientro
+   rapido. localStorage sopravvive alla chiusura della scheda (sui telefoni
+   succede di continuo); se è bloccato si ripiega, e in ultima istanza si
+   richiede la password a mano.                                             */
+const stores=()=>{ const o=[]; try{ if(localStorage) o.push(localStorage); }catch(e){}
+  try{ if(sessionStorage) o.push(sessionStorage); }catch(e){} return o; };
+const keep=(k,v)=>{ for(const s of stores()) try{ s.setItem(k,v); }catch(e){} };
+const recall=k=>{ for(const s of stores()) try{ const v=s.getItem(k); if(v) return v; }catch(e){} return ''; };
+
+/* ------------------------------------------------------------------- QR --
+   Encoder byte-mode, ECC livello L, versioni 1..9. Nessuna dipendenza.     */
+const QR=(function(){
+  const CAP=[17,32,53,78,106,134,154,192,230], TOT=[26,44,70,100,134,172,196,242,292];
+  const ECPB=[7,10,15,20,26,18,20,24,30], BLK=[1,1,1,1,1,2,2,2,2];
+  const ALIGN=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46]];
+  const FMT=[0x11F7,0x67A7,0x2ADF,0x5C8F,0x7A33,0x0C63,0x411B,0x374B];
+  const VER={7:0x07C94,8:0x085BC,9:0x09A99};
+  const EXP=new Uint8Array(512), LOG=new Uint8Array(256);
+  (function(){ let x=1; for(let i=0;i<255;i++){ EXP[i]=x; LOG[x]=i; x<<=1; if(x&0x100) x^=0x11d; }
+    for(let i=255;i<512;i++) EXP[i]=EXP[i-255]; })();
+  const mul=(a,b)=>(a===0||b===0)?0:EXP[LOG[a]+LOG[b]];
+  function gen(n){ let g=[1];
+    for(let i=0;i<n;i++){ const t=new Array(g.length+1).fill(0);
+      for(let j=0;j<g.length;j++){ t[j]^=mul(g[j],1); t[j+1]^=mul(g[j],EXP[i]); } g=t; } return g; }
+  function ecc(d,n){ const g=gen(n), r=new Array(d.length+n).fill(0);
+    for(let i=0;i<d.length;i++) r[i]=d[i];
+    for(let i=0;i<d.length;i++){ const c=r[i]; if(!c) continue;
+      for(let j=0;j<g.length;j++) r[i+j]^=mul(g[j],c); }
+    return r.slice(d.length); }
+  function words(bytes,v){
+    const i=v-1, tot=TOT[i], nb=BLK[i], ne=ECPB[i], nd=tot-ne*nb, bits=[];
+    const put=(val,len)=>{ for(let k=len-1;k>=0;k--) bits.push((val>>k)&1); };
+    put(4,4); put(bytes.length,8); for(const b of bytes) put(b,8);
+    for(let k=0;k<4&&bits.length<nd*8;k++) bits.push(0);
+    while(bits.length%8) bits.push(0);
+    const dc=[]; for(let k=0;k<bits.length;k+=8){ let x=0; for(let j=0;j<8;j++) x=(x<<1)|bits[k+j]; dc.push(x); }
+    const P=[0xEC,0x11]; let q=0; while(dc.length<nd) dc.push(P[q++%2]);
+    const per=nd/nb, db=[], eb=[];
+    for(let k=0;k<nb;k++){ const b=dc.slice(k*per,(k+1)*per); db.push(b); eb.push(ecc(b,ne)); }
+    const out=[];
+    for(let k=0;k<per;k++) for(let b=0;b<nb;b++) out.push(db[b][k]);
+    for(let k=0;k<ne;k++) for(let b=0;b<nb;b++) out.push(eb[b][k]);
+    return out;
+  }
+  const MASK=[(r,c)=>(r+c)%2===0,(r,c)=>r%2===0,(r,c)=>c%3===0,(r,c)=>(r+c)%3===0,
+    (r,c)=>(Math.floor(r/2)+Math.floor(c/3))%2===0,(r,c)=>((r*c)%2)+((r*c)%3)===0,
+    (r,c)=>(((r*c)%2)+((r*c)%3))%2===0,(r,c)=>(((r+c)%2)+((r*c)%3))%2===0];
+  function penalty(g,n){
+    let p=0;
+    const run=l=>{ let s=0,c=1; for(let i=1;i<n;i++){ if(l[i]===l[i-1]) c++; else { if(c>=5) s+=c-2; c=1; } }
+      if(c>=5) s+=c-2; return s; };
+    for(let i=0;i<n;i++){ p+=run(g[i]); p+=run(g.map(r=>r[i])); }
+    for(let r=0;r<n-1;r++) for(let c=0;c<n-1;c++){ const v=g[r][c];
+      if(v===g[r][c+1]&&v===g[r+1][c]&&v===g[r+1][c+1]) p+=3; }
+    const A=[1,0,1,1,1,0,1,0,0,0,0], B=[0,0,0,0,1,0,1,1,1,0,1];
+    const cnt=(l,pat)=>{ let k=0; for(let i=0;i+11<=n;i++){ let ok=true;
+      for(let j=0;j<11;j++) if(l[i+j]!==pat[j]){ ok=false; break; } if(ok) k++; } return k; };
+    for(let i=0;i<n;i++){ const row=g[i], col=g.map(r=>r[i]);
+      p+=40*(cnt(row,A)+cnt(row,B)+cnt(col,A)+cnt(col,B)); }
+    let d=0; for(let r=0;r<n;r++) for(let c=0;c<n;c++) d+=g[r][c];
+    return p+10*Math.floor(Math.abs(d*100/(n*n)-50)/5);
+  }
+  function build(bytes,v){
+    const n=17+v*4;
+    const m=Array.from({length:n},()=>new Array(n).fill(0));
+    const f=Array.from({length:n},()=>new Array(n).fill(false));
+    const set=(r,c,x)=>{ if(r<0||c<0||r>=n||c>=n) return; m[r][c]=x; f[r][c]=true; };
+    const find=(r,c)=>{ for(let i=-1;i<=7;i++) for(let j=-1;j<=7;j++){
+      const inb=i>=0&&i<=6&&j>=0&&j<=6;
+      set(r+i,c+j, inb&&(i===0||i===6||j===0||j===6||(i>=2&&i<=4&&j>=2&&j<=4))?1:0); } };
+    find(0,0); find(0,n-7); find(n-7,0);
+    for(let i=8;i<n-8;i++){ set(6,i,i%2===0?1:0); set(i,6,i%2===0?1:0); }
+    const ac=ALIGN[v-1];
+    for(const r of ac) for(const c of ac){
+      if((r<=8&&c<=8)||(r<=8&&c>=n-9)||(r>=n-9&&c<=8)) continue;
+      for(let i=-2;i<=2;i++) for(let j=-2;j<=2;j++)
+        set(r+i,c+j,(Math.abs(i)===2||Math.abs(j)===2||(i===0&&j===0))?1:0); }
+    set(n-8,8,1);
+    for(let i=0;i<9;i++){ if(!f[8][i]) set(8,i,0); if(!f[i][8]) set(i,8,0); }
+    for(let i=0;i<8;i++){ if(!f[8][n-1-i]) set(8,n-1-i,0); if(!f[n-1-i][8]) set(n-1-i,8,0); }
+    if(v>=7){ const x=VER[v]; for(let i=0;i<18;i++){ const b=(x>>i)&1, r=Math.floor(i/3), c=i%3;
+      set(n-11+c,r,b); set(r,n-11+c,b); } }
+    const cw=words(bytes,v); let bi=0;
+    const bit=()=>{ const b = bi<cw.length*8 ? (cw[bi>>3]>>(7-(bi&7)))&1 : 0; bi++; return b; };
+    let up=true;
+    for(let col=n-1;col>0;col-=2){ if(col===6) col--;
+      for(let k=0;k<n;k++){ const row=up?n-1-k:k;
+        for(const c of [col,col-1]) if(!f[row][c]) m[row][c]=bit(); }
+      up=!up; }
+    const apply=k=>{
+      const g=m.map(r=>r.slice());
+      for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(!f[r][c]&&MASK[k](r,c)) g[r][c]^=1;
+      const x=FMT[k];
+      for(let i=0;i<15;i++){ const b=(x>>i)&1;
+        if(i<6) g[8][i]=b; else if(i<8) g[8][i+1]=b; else if(i===8) g[7][8]=b; else g[14-i][8]=b;
+        if(i<7) g[n-1-i][8]=b; else g[8][n-15+i]=b; }
+      g[n-8][8]=1; return g;
+    };
+    let best=null,bs=Infinity;
+    for(let k=0;k<8;k++){ const g=apply(k), s=penalty(g,n); if(s<bs){ bs=s; best=g; } }
+    return best;
+  }
+  return function(text){
+    const bytes=[...new TextEncoder().encode(text)];
+    let v=1; while(v<=9 && bytes.length>CAP[v-1]) v++;
+    if(v>9) throw new Error('testo troppo lungo per il QR');
+    return build(bytes,v);
+  };
+})();
+
+function drawQR(canvas,text,px){
+  const m=QR(text), n=m.length, q=4, s=px||4, size=(n+q*2)*s;
+  canvas.width=size; canvas.height=size;
+  const x=canvas.getContext('2d');
+  x.fillStyle='#fff'; x.fillRect(0,0,size,size);
+  x.fillStyle='#000';
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(m[r][c]) x.fillRect((c+q)*s,(r+q)*s,s,s);
+}
+
+/* ----------------------------------------------------------------- MQTT --
+   Client MQTT 3.1.1 minimale su WebSocket, QoS 0. Serve solo come canale
+   di signaling: è wss sulla 443, quindi passa da NAT, proxy e firewall.
+   Un'istanza = un broker. Il Pool qui sotto ne tiene aperti più d'uno.     */
+const BROKERS=['wss://broker.emqx.io:8084/mqtt',
+               'wss://broker.hivemq.com:8884/mqtt',
+               'wss://test.mosquitto.org:8081/mqtt',
+               'wss://mqtt.eclipseprojects.io/mqtt'];
+
+class Mqtt{
+  constructor(url){ this.url=url; this.ws=null; this.buf=new Uint8Array(0); this.pid=1;
+    this.onmsg=()=>{}; this.onup=()=>{}; this.subs=[]; this.up=false; this.dead=false; this.tries=0;
+    this.lastRx=0; this.connecting=false; }
+  connect(){ return this._try(this.url); }
+  // Vivo davvero = il broker ci ha scritto di recente. Un socket può restare
+  // "aperto" per minuti anche dopo che la rete è morta: non basta 'up'.
+  alive(){ return this.up && Date.now()-this.lastRx<10000; }
+  _retry(){
+    if(this.dead) return;
+    const wait=Math.min(30000, 1500*Math.pow(2,Math.min(this.tries++,4)));
+    // se nel frattempo ci si è già ricollegati (evento 'online'), non si apre un doppione
+    setTimeout(()=>{ if(!this.dead&&!this.up&&!this.connecting) this._try(this.url).catch(()=>{}); },wait);
+  }
+  _try(url){
+    return new Promise((res,rej)=>{
+      this.acked=false; this.connecting=true;
+      let ws; try{ ws=new WebSocket(url,'mqtt'); }catch(e){ this.connecting=false; this._retry(); return rej(e); }
+      ws.binaryType='arraybuffer';
+      const to=setTimeout(()=>{ try{ws.close();}catch(e){} },9000);
+      ws.onopen=()=>{ this.ws=ws;
+        this._raw(0x10,[...this._s('MQTT'),4,0x02,0,60,...this._s('uct_'+rid(12).toLowerCase())]); };
+      ws.onmessage=ev=>{
+        this._feed(new Uint8Array(ev.data));
+        if(!this.up&&this.acked){ clearTimeout(to); this.up=true; this.tries=0; this.connecting=false;
+          this.subs.forEach(t=>this._sub(t));
+          // ping frequente: ogni risposta del broker prova che SIAMO online.
+          // Serve per non scambiare la nostra disconnessione per quella dell'host.
+          this.ping=setInterval(()=>{
+            if(Date.now()-this.lastRx>20000){ try{ ws.close(); }catch(e){} return; }
+            this._raw(0xC0,[]);
+          },4000);
+          this.onup(true); res(url); }
+      };
+      ws.onerror=()=>{};
+      ws.onclose=()=>{ clearTimeout(to); clearInterval(this.ping); this.connecting=false;
+        const wasUp=this.up; this.up=false;
+        if(wasUp) this.onup(false); else rej(new Error('closed'));
+        this._retry(); };
+    });
+  }
+  _s(s){ const u=new TextEncoder().encode(s); return [u.length>>8,u.length&255,...u]; }
+  _l(x){ const b=[]; do{ let d=x%128; x=Math.floor(x/128); if(x>0)d|=128; b.push(d); }while(x>0); return b; }
+  _raw(t,body){ if(!this.ws||this.ws.readyState!==1) return;
+    this.ws.send(new Uint8Array([t,...this._l(body.length),...body]).buffer); }
+  _sub(t){ this._raw(0x82,[this.pid>>8,this.pid++&255,...this._s(t),0]); }
+  sub(t){ if(!this.subs.includes(t)) this.subs.push(t); if(this.up) this._sub(t); }
+  pub(t,o){ this._raw(0x30,[...this._s(t),...new TextEncoder().encode(JSON.stringify(o))]); }
+  _feed(ch){
+    this.lastRx=Date.now();
+    const b=new Uint8Array(this.buf.length+ch.length); b.set(this.buf); b.set(ch,this.buf.length); this.buf=b;
+    for(;;){
+      if(this.buf.length<2) return;
+      let mul=1,len=0,i=1,d;
+      do{ if(i>=this.buf.length) return; d=this.buf[i++]; len+=(d&127)*mul; mul*=128; }while(d&128);
+      if(this.buf.length<i+len) return;
+      const t=this.buf[0]>>4, body=this.buf.slice(i,i+len); this.buf=this.buf.slice(i+len);
+      if(t===2) this.acked=true;
+      if(t===3){ const tl=(body[0]<<8)|body[1];
+        try{ this.onmsg(JSON.parse(new TextDecoder().decode(body.slice(2+tl)))); }catch(e){} }
+    }
+  }
+  close(){ this.dead=true; clearInterval(this.ping); try{this.ws.close();}catch(e){} }
+}
+
+/* Pool: tiene aperti più broker insieme e pubblica su tutti. Se uno muore a
+   metà partita gli altri portano avanti il gioco. I doppioni si scartano
+   con l'id del messaggio.                                                  */
+class Pool{
+  constructor(urls){ this.urls=urls; this.cs=[]; this.topic=null; this.dead=false;
+    this.onmsg=()=>{}; this.onup=()=>{}; this.seen=new Set(); this.q=[]; }
+  connect(topic){
+    this.topic=topic;
+    return new Promise(res=>{
+      let done=0, settled=false;
+      const finish=()=>{ if(!settled){ settled=true; res(); } };
+      const hard=setTimeout(finish,11000);
+      this.urls.forEach(u=>{
+        const c=new Mqtt(u);
+        c.onmsg=m=>this._in(m);
+        c.onup=()=>this._state();
+        this.cs.push(c);
+        c.connect()
+          .then(()=>{ c.sub(topic);
+            if(this.cs.filter(x=>x.up).length===1) setTimeout(finish,2500); }) // 2.5s agli altri
+          .catch(()=>{})
+          .finally(()=>{ if(++done===this.urls.length){ clearTimeout(hard); finish(); } });
+      });
+    }).then(()=>{
+      // i broker non ancora pronti continuano a ritentare da soli in sottofondo,
+      // e Mqtt._try ri-sottoscrive i topic da sé a ogni riconnessione
+      this._state();
+      return this.live();
+    });
+  }
+  live(){ return this.cs.filter(c=>c.up).length; }
+  // siamo online davvero se almeno un broker ci ha risposto da poco
+  healthy(){ return this.cs.some(c=>c.alive()); }
+  // la rete è tornata: niente attese di backoff, si riprova subito
+  reconnectNow(){
+    for(const c of this.cs){ c.tries=0; if(!c.up&&!c.connecting&&!c.dead) c._try(c.url).catch(()=>{}); }
+  }
+  pub(o){ for(const c of this.cs) if(c.up) c.pub(this.topic,o); }
+  _in(m){
+    if(!m||!m.i||this.seen.has(m.i)) return;     // scarta i doppioni fra broker
+    this.seen.add(m.i); this.q.push(m.i);
+    if(this.q.length>1000) this.seen.delete(this.q.shift());
+    this.onmsg(m);
+  }
+  _state(){ if(!this.dead) this.onup(this.live()); }
+  close(){ this.dead=true; this.cs.forEach(c=>c.close()); }
+}
+
+/* ------------------------------------------------------------------ NET --
+   Un "link" per peer. Prova il DataChannel diretto; se l'ICE non buca il
+   NAT, continua sul relay MQTT — ma cifrato, perché il topic è pubblico.   */
+const ICE={iceServers:[
+  {urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},
+  {urls:'stun:global.stun.twilio.com:3478'}]};
+
+/* La password non viaggia mai. Da (codice + password) si ricavano due cose:
+   il nome del topic — chi non ha la password non trova nemmeno il canale —
+   e la chiave AES che cifra TUTTO il signaling, nomi e SDP compresi.       */
+async function roomCrypto(code,pass){
+  const enc=new TextEncoder();
+  const base=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt:enc.encode('uct-v2|'+code),iterations:200000,hash:'SHA-256'},
+    base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  const h=await crypto.subtle.digest('SHA-256',enc.encode('uct-topic|'+code+'|'+pass));
+  const topic='uct2/'+[...new Uint8Array(h).slice(0,10)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  return {key,topic};
+}
+
+class Net{
+  constructor(room,pass,isHost){
+    this.room=room; this.pass=pass; this.isHost=isHost; this.me=rid(10);
+    this.links=new Map(); this.pool=new Pool(BROKERS); this.brokers=0;
+    this.onpeer=()=>{}; this.ondata=()=>{}; this.onstatus=()=>{}; this.onfail=()=>{};
+    this.onnewhost=()=>{};
+    this.pool.onmsg=m=>this._envelope(m);
+    this.pool.onup=n=>{ this.brokers=n; this.onstatus(); };
+  }
+  transport(){
+    const l=[...this.links.values()];
+    if(!l.length) return 'in attesa';
+    return l.some(x=>x.mode==='p2p')
+      ? (l.every(x=>x.mode==='p2p')?'P2P diretto':'misto P2P/relay') : 'relay cifrato';
+  }
+  async _keys(){
+    this.kp=await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},false,['deriveKey']);
+    this.pk=await crypto.subtle.exportKey('jwk',this.kp.publicKey);
+  }
+  async _derive(jwk){
+    const pub=await crypto.subtle.importKey('jwk',jwk,{name:'ECDH',namedCurve:'P-256'},false,[]);
+    return crypto.subtle.deriveKey({name:'ECDH',public:pub},this.kp.privateKey,
+      {name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  }
+  async start(){
+    await this._keys();
+    const rc=await roomCrypto(this.room,this.pass);
+    this.rk=rc.key; this.topic=rc.topic;
+    const live=await this.pool.connect(this.topic);
+    if(!live) throw new Error('nessun broker raggiungibile');
+    if(this.isHost){ this._pub({t:'host',from:this.me}); }
+    else{
+      this.rehello();
+      // nessuna risposta = password sbagliata, codice errato, o host assente
+      this._join=setTimeout(()=>{ if(!this.links.size)
+        this.onfail('Nessuna risposta. Controlla codice e password, oppure l\'host non è in linea.');
+      },14000);
+    }
+  }
+  // si presenta finché qualcuno (l'host di turno) non risponde con un'offerta
+  rehello(){
+    clearInterval(this._hb);
+    const hello=()=>this._pub({t:'hello',from:this.me,name:ME.name,pk:this.pk});
+    hello();
+    this._hb=setInterval(()=>{ if(this.links.size) clearInterval(this._hb); else hello(); },2500);
+  }
+  // ogni messaggio esce cifrato con la chiave della stanza, con un id per la deduplica
+  async _pub(o){
+    try{
+      const iv=crypto.getRandomValues(new Uint8Array(12));
+      const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},this.rk,
+        new TextEncoder().encode(JSON.stringify(o)));
+      this.pool.pub({i:rid(12),n:b64(iv),e:b64(ct)});
+    }catch(e){}
+  }
+  async _envelope(m){
+    if(!m||!m.n||!m.e||!this.rk) return;
+    let o;
+    try{
+      const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(m.n)},this.rk,ub64(m.e));
+      o=JSON.parse(new TextDecoder().decode(pt));
+    }catch(e){ return; }        // password diversa o traffico altrui: si ignora
+    this._sig(o);
+  }
+
+  async _sig(m){
+    if(!m||m.from===this.me) return;
+    if(m.to&&m.to!==this.me) return;
+    if(m.t==='hello'&&this.isHost) return this._offer(m.from,m.name,m.pk);
+    if(m.t==='host'&&!this.isHost) return this._pub({t:'hello',from:this.me,name:ME.name,pk:this.pk});
+    // un giocatore ha preso in mano la partita: lo decide l'app, non la rete
+    if(m.t==='newhost'){ this.onnewhost(m); return; }
+    if(m.t==='offer'&&!this.isHost){
+      const l=this._mk(m.from,m.pk);
+      try{
+        await l.pc.setRemoteDescription(m.sdp);
+        const a=await l.pc.createAnswer(); await l.pc.setLocalDescription(a);
+        this._pub({t:'answer',from:this.me,to:m.from,sdp:a});
+      }catch(e){}
+      return;
+    }
+    const L=this.links.get(m.from);
+    if(m.t==='answer'&&L&&L.pc){ if(!L.pc.currentRemoteDescription)
+      try{ await L.pc.setRemoteDescription(m.sdp); }catch(e){} return; }
+    if(m.t==='ice'&&L&&L.pc){ try{ await L.pc.addIceCandidate(m.c); }catch(e){} return; }
+    if(m.t==='rly'){
+      const l=this.links.get(m.from); if(!l||!l.key) return;
+      try{
+        const key=await l.key;
+        const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(m.n)},key,ub64(m.e));
+        this.ondata(m.from,JSON.parse(new TextDecoder().decode(pt)));
+      }catch(e){}
+      return;
+    }
+    if(m.t==='bye') return this._drop(m.from);
+  }
+
+  _mk(id,pk){
+    let l=this.links.get(id); if(l) return l;
+    clearTimeout(this._join);
+    l={id,pc:null,dc:null,mode:'relay',key:pk?this._derive(pk):null};
+    this.links.set(id,l);
+    l.pc=new RTCPeerConnection(ICE);
+    l.pc.onicecandidate=e=>{ if(e.candidate) this._pub({t:'ice',from:this.me,to:id,c:e.candidate}); };
+    l.pc.ondatachannel=e=>this._wire(l,e.channel);
+    this.onstatus();
+    return l;
+  }
+  _wire(l,dc){
+    l.dc=dc;
+    dc.onopen=()=>{ l.mode='p2p'; this.onstatus(); };
+    dc.onclose=()=>{ l.mode='relay'; this.onstatus(); };
+    dc.onmessage=e=>{ try{ this.ondata(l.id,JSON.parse(e.data)); }catch(err){} };
+  }
+  async _offer(id,name,pk){
+    if(this.links.has(id)){ this.onpeer(id,name); return; }
+    const l=this._mk(id,pk);
+    this._wire(l,l.pc.createDataChannel('g',{ordered:true}));
+    try{
+      const o=await l.pc.createOffer(); await l.pc.setLocalDescription(o);
+      this._pub({t:'offer',from:this.me,to:id,sdp:o,pk:this.pk});
+    }catch(e){}
+    this.onpeer(id,name);
+  }
+  send(id,obj){
+    const l=this.links.get(id); if(!l) return;
+    if(l.dc&&l.dc.readyState==='open'){ try{ l.dc.send(JSON.stringify(obj)); return; }catch(e){} }
+    if(!l.key) return;
+    l.key.then(async key=>{
+      const iv=crypto.getRandomValues(new Uint8Array(12));
+      const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,
+        new TextEncoder().encode(JSON.stringify(obj)));
+      this._pub({t:'rly',from:this.me,to:id,n:b64(iv),e:b64(ct)});
+    }).catch(()=>{});
+  }
+  _drop(id){ const l=this.links.get(id);
+    if(l){ try{ l.pc&&l.pc.close(); }catch(e){} this.links.delete(id); }
+    this.onstatus(); this.onpeer(id,null,true); }
+  bye(){ try{ this._pub({t:'bye',from:this.me}); setTimeout(()=>this.pool.close(),150); }catch(e){} }
+}
+
+/* ------------------------------------------------------------------ GIOCO
+   Mazzo: per colore 0 x1, 1..9 x2, salta/inverti/+2 x2 = 25 x4 = 100
+          + 4 cambia colore + 4 pesca quattro           = 108
+   Punti : numeri = valore, azioni = 20, jolly = 50. Si arriva a 500.       */
+const COLORS=['r','g','b','y'];
+const LBL={skip:'⊘',rev:'⇄','+2':'+2',wild:'★','+4':'+4'};
+const CNAME={r:'Rosso',g:'Verde',b:'Blu',y:'Giallo'};
+
+function buildDeck(){
+  const d=[];
+  for(const c of COLORS){
+    d.push({c,v:'0'});
+    for(let n=1;n<=9;n++){ d.push({c,v:''+n}); d.push({c,v:''+n}); }
+    for(const v of ['skip','rev','+2']){ d.push({c,v}); d.push({c,v}); }
+  }
+  for(let i=0;i<4;i++){ d.push({c:'w',v:'wild'}); d.push({c:'w',v:'+4'}); }
+  return shuffle(d);
+}
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function points(c){ return c.c==='w'?50 : (['skip','rev','+2'].includes(c.v)?20:parseInt(c.v,10)); }
+function playable(card,top,color){
+  if(card.c==='w') return true;
+  if(card.c===color) return true;
+  if(top && top.c!=='w' && card.v===top.v) return true;
+  return false;
+}
+// con le pescate accumulate si può rispondere solo con la stessa carta
+function legal(card,top,color,stack,stackType){
+  if(stack>0) return card.v===stackType;
+  return playable(card,top,color);
+}
+
+class Game{
+  constructor(opts){
+    opts=opts||{};
+    this.P=[]; this.phase='lobby'; this.target=500; this.log=[]; this.seq=0;
+    this.strict4=opts.strict4!==false;      // ufficiale: acceso
+    this.strictW=!!opts.strictW;            // casalinga: spenta
+    this.freeDraw=opts.freeDraw!==false;    // dopo la pescata giochi ciò che vuoi
+    this.stackRule=!!opts.stack;
+    this.handover=opts.handover!==false;  // copia della partita ai successori
+    this.stack=0; this.stackType=null;
+  }
+  /* Unico posto che decide se una carta si può giocare: lo usa l'host per
+     validare, e il client per evidenziare. Se divergessero, il giocatore
+     vedrebbe carte accese che poi l'host rifiuta.                          */
+  whyNot(p,c){
+    if(!legal(c,this.top(),this.color,this.stack,this.stackType))
+      return this.stack>0 ? ('devi rispondere con un '+this.stackType+' o pescare '+this.stack)
+                          : 'carta non giocabile';
+    if(this.stack===0&&c.v==='+4'&&this.strict4&&p.hand.some(x=>x.c===this.color))
+      return 'hai ancora carte '+CNAME[this.color]+': non puoi giocare il Pesca Quattro';
+    if(this.stack===0&&c.v==='wild'&&this.strictW&&
+       p.hand.some(x=>x.c!=='w'&&playable(x,this.top(),this.color)))
+      return 'hai altre carte giocabili: il Cambia Colore si tiene per quando sei bloccato';
+    return null;
+  }
+  add(id,name){
+    const same=this.P.find(p=>p.id===id);
+    if(same){
+      // stesso dispositivo che torna dopo un buco di rete: si riattiva
+      if(!same.conn){ same.conn=true; this.say(same.name+' è rientrato.'); }
+      return;
+    }
+    const nm=(name||'Anon');
+    const seat=this.P.find(p=>!p.conn&&p.name===nm);
+    if(seat){                       // rientro: si riprende lo stesso posto
+      const old=seat.id; seat.id=id; seat.conn=true;
+      if(this.pending&&this.pending.id===old) this.pending.id=id;
+      this.say(nm+' è rientrato.');
+      return;
+    }
+    if(this.phase!=='lobby') return;   // a partita iniziata non entra nessuno
+    if(this.P.length>=10) return;
+    this.P.push({id,name:nm,hand:[],score:0,said:false,conn:true});
+  }
+  drop(id){ const p=this.P.find(x=>x.id===id); if(p) p.conn=false; }
+  say(t){ this.log.push(t); if(this.log.length>10) this.log.shift(); }
+
+  startRound(){
+    this.deck=buildDeck(); this.discard=[]; this.stack=0; this.stackType=null;
+    this.P.forEach(p=>{ p.hand=this.deck.splice(0,7); p.said=false; });
+    let first;
+    do{ first=this.deck.shift(); if(first.c==='w') this.deck.push(first); }while(first.c==='w');
+    this.discard.push(first);
+    this.color=first.c; this.dir=1; this.pending=null; this.phase='play';
+    // chi inizia ruota a ogni mano: partire sempre per primi è un vantaggio
+    this.first = this.first===undefined ? 0 : (this.first+1)%this.P.length;
+    this.turn = this.first;
+    const opener=this.P[this.turn];
+    this.say('Nuova mano. Inizia '+opener.name+'.');
+    if(first.v==='skip'){ this.say(opener.name+' salta il turno.'); this.next(); }
+    else if(first.v==='rev'){
+      this.dir=-1;
+      this.turn=(this.first-1+this.P.length)%this.P.length;
+      this.say('Si parte al contrario.');
+    }
+    else if(first.v==='+2'){
+      if(this.stackRule){ this.stack=2; this.stackType='+2'; this.say('Pesca Due iniziale: 2 in canna.'); }
+      else { this.give(opener,2); this.say(opener.name+' pesca 2 e salta.'); this.next(); }
+    }
+    this.skipDead();
+  }
+  top(){ return this.discard[this.discard.length-1]; }
+  cur(){ return this.P[this.turn]; }
+  /* Chi è scollegato esce dal giro, anche per gli effetti: altrimenti chi si
+     assenta un minuto torna con i +2 e i +4 di chi giocava prima di lui,
+     carte che non poteva evitare. Al tavolo vero chi si alza viene saltato. */
+  nextActive(i){
+    const n=this.P.length; let j=(i+this.dir+n)%n, g=0;
+    while(!this.P[j].conn&&g++<n) j=(j+this.dir+n)%n;
+    return j;
+  }
+  next(n=1){ for(let i=0;i<n;i++) this.turn=this.nextActive(this.turn); }
+  peek(){ return this.P[this.nextActive(this.turn)]; }
+  activeCount(){ return this.P.filter(p=>p.conn).length; }
+  reshuffle(){
+    if(this.deck.length) return;
+    if(this.discard.length<2) return;
+    const t=this.discard.pop();
+    this.deck=shuffle(this.discard.map(c=>c.c==='w'?{c:'w',v:c.v}:c));
+    this.discard=[t]; this.say('Mazzo rimescolato.');
+  }
+  give(p,n){ for(let i=0;i<n;i++){ this.reshuffle(); if(!this.deck.length) break; p.hand.push(this.deck.shift()); }
+    if(n>0) p.said=false; }
+
+  play(id,idx,chosen){
+    if(this.phase!=='play') return 'partita non attiva';
+    const p=this.cur();
+    if(p.id!==id) return 'non è il tuo turno';
+    const card=p.hand[idx];
+    if(!card) return 'carta inesistente';
+    if(this.pending&&this.pending.id!==id) this.pending=null;
+    // idx -1 = dopo la pescata sei libero di giocare qualsiasi carta
+    if(this.pending&&this.pending.idx!==-1&&this.pending.idx!==idx)
+      return 'puoi giocare solo la carta appena pescata';
+    const no=this.whyNot(p,card);
+    if(no) return no;
+
+    p.hand.splice(idx,1);
+    this.pending=null;
+    this.discard.push(card);
+    this.color = card.c==='w' ? (COLORS.includes(chosen)?chosen:'r') : card.c;
+    this.say(p.name+' gioca '+this.cardName(card)+(card.c==='w'?' → '+CNAME[this.color]:''));
+
+    if(p.hand.length===0){ this.endRound(p); return null; }
+    if(p.hand.length!==1) p.said=false;
+
+    // "in due" conta chi è davvero al tavolo, non i posti occupati
+    const two=this.activeCount()===2;
+    if(card.v==='skip'){ this.say(this.peek().name+' salta il turno.'); this.next(2); }
+    else if(card.v==='rev'){
+      if(two) this.say('Inverti: in due vale come salta.');
+      else { this.dir*=-1; this.say('Senso invertito.'); }
+      this.next(two?2:1);
+    }
+    else if(card.v==='+2'||card.v==='+4'){
+      const n=card.v==='+2'?2:4;
+      if(this.stackRule){
+        this.stack+=n; this.stackType=card.v;
+        this.say('In canna: '+this.stack+' carte da pescare.');
+        this.next();
+      } else {
+        const t=this.peek(); this.give(t,n);
+        this.say(t.name+' pesca '+n+' e salta.'); this.next(2);
+      }
+    }
+    else this.next();
+    this.skipDead();
+    return null;
+  }
+  draw(id){
+    if(this.phase!=='play') return 'partita non attiva';
+    const p=this.cur();
+    if(p.id!==id) return 'non è il tuo turno';
+    if(this.pending) return 'hai già pescato';
+    if(this.stack>0){                       // incassa le pescate accumulate
+      const n=this.stack;
+      this.give(p,n); this.stack=0; this.stackType=null;
+      this.say(p.name+' incassa '+n+' carte.');
+      this.next(); this.skipDead(); return null;
+    }
+    this.reshuffle();
+    if(!this.deck.length) return 'mazzo esaurito';
+    p.hand.push(this.deck.shift()); p.said=false;
+    this.say(p.name+' pesca.');
+    const last=p.hand.length-1;
+    if(this.freeDraw){
+      // qualsiasi carta giocabile va bene, non solo quella appena pescata
+      if(p.hand.some(c=>!this.whyNot(p,c))){ this.pending={id,idx:-1}; return null; }
+    } else if(!this.whyNot(p,p.hand[last])){
+      this.pending={id,idx:last}; return null;
+    }
+    this.next(); this.skipDead(); return null;
+  }
+  pass(id){
+    if(this.phase!=='play') return 'partita non attiva';
+    const p=this.cur();
+    if(p.id!==id) return 'non è il tuo turno';
+    if(!this.pending) return 'devi prima pescare';
+    this.pending=null; this.say(p.name+' passa.'); this.next(); this.skipDead(); return null;
+  }
+  callOne(id){
+    const p=this.P.find(x=>x.id===id); if(!p) return 'giocatore ignoto';
+    if(p.hand.length>2) return 'hai troppe carte per dire 1';
+    p.said=true; this.say(p.name+' dice "UNO!"'); return null;
+  }
+  catchPlayer(id,target){
+    const c=this.P.find(x=>x.id===id), t=this.P.find(x=>x.id===target);
+    if(!c||!t||c===t) return 'no';
+    if(t.hand.length!==1||t.said) return 'niente da beccare';
+    this.give(t,2); this.say(c.name+' becca '+t.name+': +2 carte!');
+    return null;
+  }
+  skipDead(){
+    if(this.phase!=='play') return;
+    let g=0;
+    while(this.P.length&&!this.cur().conn&&g++<this.P.length){
+      if(this.stack>0){ this.give(this.cur(),this.stack); this.stack=0; this.stackType=null; }
+      this.say(this.cur().name+' è offline: turno saltato.'); this.pending=null; this.next();
+    }
+  }
+  endRound(w){
+    let pts=0;
+    this.P.forEach(p=>{ if(p!==w) p.hand.forEach(c=>pts+=points(c)); });
+    w.score+=pts; this.lastWinner=w.id;
+    this.stack=0; this.stackType=null;
+    this.say(w.name+' chiude la mano: +'+pts+' punti.');
+    this.phase = w.score>=this.target ? 'gameover' : 'roundend';
+  }
+  cardName(c){
+    if(c.c==='w') return c.v==='+4'?'Pesca Quattro':'Cambia Colore';
+    const n={skip:'Salta',rev:'Inverti','+2':'Pesca Due'}[c.v];
+    return CNAME[c.c]+' '+(n||c.v);
+  }
+  view(id){
+    const me=this.P.find(p=>p.id===id);
+    return {
+      t:'state', seq:++this.seq, you:id, phase:this.phase, target:this.target,
+      players:this.P.map(p=>({id:p.id,name:p.name,n:p.hand.length,said:p.said,
+        score:p.score,conn:p.conn,bot:!!p.bot})),
+      top:this.discard?this.top():null, color:this.color,
+      turn:this.P[this.turn]?this.P[this.turn].id:null, dir:this.dir,
+      deck:this.deck?this.deck.length:0, stack:this.stack, stackType:this.stackType,
+      strict4:this.strict4, strictW:this.strictW, freeDraw:this.freeDraw,
+      host:this.hostId||null, epoch:this.epoch||0, handover:this.handover!==false,
+      hand:me?me.hand:[], pending:(this.pending&&this.pending.id===id)?this.pending.idx:null,
+      log:this.log[this.log.length-1]||'', lastWinner:this.lastWinner||null
+    };
+  }
+}
+
+/* -------------------------------------------------------------------- BOT
+   Avversari simulati. Girano sull'host e passano dalla STESSA validazione
+   dei giocatori umani (G.play/draw/pass): un bug del bot non può corrompere
+   la partita, al massimo gli fa perdere il turno.
+   Tre livelli: facile gioca a caso, normale e tosto ragionano.             */
+const BOTNAMES=['Ada','Bruno','Cleo','Dino','Elsa','Furio','Gina','Iko','Lena'];
+
+function botChoose(G,p){
+  const idx=p.hand.map((c,i)=>i).filter(i=>{
+    if(G.pending&&G.pending.idx!==-1&&G.pending.idx!==i) return false;
+    return !G.whyNot(p,p.hand[i]);
+  });
+  if(!idx.length) return G.pending?{t:'pass'}:{t:'draw'};
+  if(p.level==='facile'){
+    const i=idx[Math.floor(Math.random()*idx.length)];
+    return {t:'play',i,color:bestColor(p,p.hand[i])};
+  }
+  const next=G.peek();
+  const pressure = next && next.hand.length<=2;      // il prossimo sta per chiudere
+  const cnt={}; p.hand.forEach(x=>{ if(x.c!=='w') cnt[x.c]=(cnt[x.c]||0)+1; });
+  let best=idx[0], bestS=-1e9;
+  for(const i of idx){
+    const c=p.hand[i];
+    let s;
+    if(c.c==='w') s = c.v==='+4' ? (pressure?120:18) : (pressure?55:12); // i jolly si tengono
+    else if(c.v==='+2') s = pressure?110:66;
+    else if(c.v==='skip') s = pressure?95:58;
+    else if(c.v==='rev')  s = pressure?90:54;
+    else s = 40+parseInt(c.v,10);            // scarica prima i numeri alti: pesano
+    if(c.c!=='w') s += (cnt[c.c]||0)*4;      // resta nel colore che hai di più
+    if(p.level==='tosto'&&c.c!=='w'&&c.c===G.color) s+=3;
+    s += Math.random()*(p.level==='tosto'?2:9);   // il normale è meno preciso
+    if(s>bestS){ bestS=s; best=i; }
+  }
+  return {t:'play',i:best,color:bestColor(p,p.hand[best])};
+}
+function bestColor(p,card){
+  if(card.c!=='w') return undefined;
+  const cnt={r:0,g:0,b:0,y:0};
+  p.hand.forEach(x=>{ if(x.c!=='w'&&x!==card) cnt[x.c]++; });
+  let best='r';
+  for(const c of COLORS) if(cnt[c]>cnt[best]) best=c;
+  return cnt[best]===0 ? COLORS[Math.floor(Math.random()*4)] : best;
+}
+// probabilità che il bot si dimentichi di dire UNO: è la sua fragilità
+const FORGET={facile:.75,normale:.3,tosto:0};
+const WATCH ={facile:0,normale:.5,tosto:1};        // quanto è attento a beccarti
+
+/* -------------------------------------------------------------------- APP */
+const ME={name:'',id:null,host:false,pass:''};
+let NET=null,G=null,VIEW=null,ROOM=null,lastSeq=0,lastHeard=0;
+
+const show=id=>document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
+function status(extra){
+  if(!NET){ $('#net').textContent=extra||'—'; return; }
+  const n=NET.brokers;
+  let t=extra;
+  if(!t){
+    t=NET.transport();
+    // in solitaria contro i bot non sta aspettando nessuno: dirlo è fuorviante
+    if(!NET.links.size&&G&&G.phase!=='lobby'&&G.P.every(p=>p.bot||p.id===ME.id))
+      t='partita locale';
+  }
+  $('#net').textContent=(n?n+(n===1?' canale':' canali'):'nessun canale')+' · '+t;
+}
+const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const toast=m=>{ $('#log').textContent='⚠ '+m; };
+
+// forma da costruttore: 'stack' qui è l'opzione, non il contatore di Game
+const lobbyRules=()=>({
+  strict4:$('#o-strict4').checked,
+  strictW:$('#o-strictw').checked,
+  freeDraw:$('#o-freedraw').checked,
+  stack:$('#o-stack').checked,
+  handover:$('#o-handover').checked
+});
+
+/* ------------------------------------------------ passaggio di consegne --
+   L'host manda di continuo una copia della partita ai due giocatori umani
+   che vengono dopo di lui. Se sparisce, il primo dei due la riprende da
+   lì: stesse carte, stessi punti, stesso turno. Gli altri si ricollegano.
+   L'epoca (epoch) cresce a ogni passaggio: se il vecchio host ricompare,
+   vede un'epoca più alta della sua e si rimette da parte come ospite.     */
+const SILENCE=30000;        // ospite muto da tanto: il suo turno si salta
+const HANDOVER=15000;       // host muto da tanto: il primo successore subentra
+const successorsOf=(players,hostId)=>
+  players.filter(p=>!p.bot&&p.conn!==false&&p.id!==hostId).map(p=>p.id);
+
+let backup=null, curEpoch=0, hostGone=0, backupTimer=null;
+let hostLoops=false, guestLoops=false;
+const lastSeen=new Map();
+
+function hostInit(){
+  ME.id=NET.me;
+  G=new Game(lobbyRules());
+  G.epoch=0;
+  G.add(NET.me,ME.name);
+  becomeHost();
+}
+// imposta il ruolo di host su una partita esistente (nuova o ripresa)
+function becomeHost(){
+  ME.host=true; NET.isHost=true; G.hostId=NET.me;
+  NET.onnewhost=onNewHost;          // se qualcuno subentra, devo saperlo e farmi da parte
+  const now=Date.now();
+  for(const p of G.P) lastSeen.set(p.id,now);    // tutti partono col beneficio del dubbio
+  NET.onpeer=(id,name,gone)=>{
+    if(!G||!ME.host) return;          // difesa: mai lavorare su una partita buttata
+    if(gone) G.drop(id); else if(name) G.add(id,name);
+    lastSeen.set(id,Date.now()); pushAll();
+  };
+  NET.ondata=(from,msg)=>{
+    if(!G||!ME.host) return;
+    lastSeen.set(from,Date.now());
+    const who=G.P.find(p=>p.id===from);
+    if(who&&!who.conn&&from!==ME.id){ who.conn=true; G.say(who.name+' è rientrato.'); }
+    if(msg.t==='ping'){ if(who&&!who.conn) pushAll(); return; }
+    let err=null;
+    if(msg.t==='join'){ G.add(from,msg.name); pushAll(); return; }
+    if(msg.t==='play') err=G.play(from,msg.i,msg.color);
+    else if(msg.t==='draw') err=G.draw(from);
+    else if(msg.t==='pass') err=G.pass(from);
+    else if(msg.t==='one') err=G.callOne(from);
+    else if(msg.t==='catch') err=G.catchPlayer(from,msg.id);
+    if(err&&from!==ME.id) NET.send(from,{t:'err',m:err});
+    else if(err) toast(err);
+    pushAll();
+  };
+  if(hostLoops) return;
+  hostLoops=true;
+  setInterval(()=>{
+    if(!ME.host||!G) return;
+    if(G.phase!=='lobby') pushAll();                                        // keepalive
+    // faro: chi è stato offline si è perso l'annuncio del nuovo host, e
+    // MQTT non ricapita i messaggi persi. Ripeterlo lo fa ritrovare.
+    if(G.epoch>0) NET._pub({t:'newhost',from:NET.me,epoch:G.epoch});
+  },7000);
+  // chi tace troppo è fuori: il suo turno si salta, le sue carte restano sue
+  let tick=Date.now(), hostWasOnline=true;
+  setInterval(()=>{
+    const now=Date.now(), gap=now-tick; tick=now;
+    if(!ME.host||!G) return;
+    // se il telefono dell'host era in pausa, non è colpa degli altri
+    if(gap>8000){ for(const p of G.P) lastSeen.set(p.id,now); return; }
+    // idem se è l'host a essere offline: non si buttano fuori tutti
+    if(!NET.pool.healthy()){ hostWasOnline=false; return; }
+    if(!hostWasOnline){ hostWasOnline=true; for(const p of G.P) lastSeen.set(p.id,now); return; }
+    if(G.phase==='lobby') return;
+    let changed=false;
+    for(const p of G.P){
+      if(p.bot||p.id===ME.id||!p.conn) continue;
+      if(now-(lastSeen.get(p.id)||0)>SILENCE){ p.conn=false; G.say(p.name+' non risponde.'); changed=true; }
+    }
+    if(changed){ G.skipDead(); pushAll(); }
+  },4000);
+}
+
+function sendBackup(){
+  if(!ME.host||!G||G.phase==='lobby'||G.handover===false) return;
+  const s=JSON.parse(JSON.stringify(G));
+  for(const id of successorsOf(G.P,ME.id).slice(0,2))
+    if(NET.links.has(id)) NET.send(id,{t:'backup',s});
+}
+// raggruppa le raffiche di aggiornamenti: parte solo l'ultima copia
+function scheduleBackup(){ clearTimeout(backupTimer); backupTimer=setTimeout(sendBackup,300); }
+
+// un ospite si ritrova host: riprende la partita dalla copia ricevuta
+function promote(){
+  if(!backup||ME.host) return;
+  const g=new Game({}); Object.assign(g,backup);
+  const oldHost=g.hostId;
+  g.epoch=(g.epoch||0)+1;
+  g.seq=(g.seq||0)+1000;                          // gli stati nuovi devono vincere sui vecchi
+  const oh=g.P.find(p=>p.id===oldHost); if(oh) oh.conn=false;
+  for(const id of [...NET.links.keys()]) NET._drop(id);
+  G=g; curEpoch=g.epoch; backup=null; hostGone=0;
+  becomeHost();
+  G.say(ME.name+' prende in mano la partita.');
+  G.skipDead();
+  NET._pub({t:'newhost',from:NET.me,epoch:G.epoch});
+  pushAll();
+}
+// ero host, ma qualcuno ha un'epoca più recente: torno ospite senza perdere il posto
+function demote(){
+  ME.host=false; NET.isHost=false;
+  clearTimeout(botTimer); clearTimeout(backupTimer);
+  // L'ordine conta: prima i gestori da ospite, poi si chiudono i collegamenti,
+  // poi si butta la partita. Chiudere un collegamento avvisa il gestore
+  // corrente: se fosse ancora quello da host, lavorerebbe su G già nullo.
+  setGuestHandlers();
+  for(const id of [...NET.links.keys()]) NET._drop(id);
+  G=null;
+  ensureGuestLoops();
+  lastSeq=0; lastHeard=Date.now();
+  NET.rehello();
+  toast('Un altro giocatore ha preso in mano la partita: ti ricolleghi.');
+}
+function onNewHost(m){
+  if((m.epoch||0)<=curEpoch) return;
+  curEpoch=m.epoch;
+  if(ME.host){ demote(); return; }
+  for(const id of [...NET.links.keys()]) if(id!==m.from) NET._drop(id);
+  backup=null; hostGone=0; lastSeq=0; lastHeard=Date.now();
+  status('nuovo host, ricollegamento…');
+  NET.rehello();
+}
+
+function pushAll(){
+  if(!G) return;
+  VIEW=G.view(ME.id);
+  if(G.phase==='lobby') renderLobby(); else renderAll();
+  for(const id of NET.links.keys()) NET.send(id,G.view(id));
+  botTick();
+  scheduleBackup();
+}
+
+/* Motore dei bot: gira solo sull'host, con una pausa perché altrimenti le
+   loro mosse sono istantanee e non si capisce cos'è successo.             */
+let botTimer=null, catchTimer=null, botLevel=recall('uct_botlv')||'normale';
+function botTick(){
+  clearTimeout(botTimer);
+  if(!ME.host||!G||G.phase!=='play') return;
+  const p=G.cur();
+  if(!p||!p.bot){ botWatch(); return; }
+  botTimer=setTimeout(()=>{
+    if(!ME.host||!G||G.phase!=='play') return;
+    const cur=G.cur();
+    if(!cur||!cur.bot) return;
+    const lv=cur.level||'normale';
+    // dice UNO scendendo a una carta, salvo dimenticanza: è la sua fragilità
+    if(cur.hand.length===2&&Math.random()>FORGET[lv]) G.callOne(cur.id);
+    const a=botChoose(G,cur);
+    const err = a.t==='play' ? G.play(cur.id,a.i,a.color)
+              : a.t==='draw' ? G.draw(cur.id) : G.pass(cur.id);
+    // rete di sicurezza: qualunque cosa succeda, il turno non si inchioda
+    if(err){ if(G.draw(cur.id)&&G.pass(cur.id)) G.next(); }
+    pushAll();
+  }, 700+Math.random()*650);
+}
+function botWatch(){
+  if(catchTimer||!ME.host||!G||G.phase!=='play') return;
+  const victim=G.P.find(p=>!p.bot&&p.conn&&p.hand.length===1&&!p.said);
+  if(!victim) return;
+  const hunter=G.P.find(p=>p.bot&&Math.random()<WATCH[p.level||'normale']);
+  if(!hunter) return;
+  catchTimer=setTimeout(()=>{
+    catchTimer=null;
+    if(ME.host&&G&&G.phase==='play'&&victim.hand.length===1&&!victim.said){
+      G.catchPlayer(hunter.id,victim.id); pushAll();
+    }
+  }, 1300+Math.random()*1600);
+}
+function addBot(){
+  if(!ME.host||!G||G.phase!=='lobby'||G.P.length>=10) return;
+  const used=G.P.map(p=>p.name);
+  const nm=BOTNAMES.find(n=>!used.includes(n))||('Bot '+G.P.length);
+  G.add('bot_'+rid(6),nm);
+  const p=G.P[G.P.length-1];
+  if(p){ p.bot=true; p.level=botLevel; }
+  pushAll();
+}
+function removeBot(){
+  if(!ME.host||!G||G.phase!=='lobby') return;
+  for(let i=G.P.length-1;i>=0;i--) if(G.P[i].bot){ G.P.splice(i,1); break; }
+  pushAll();
+}
+const LEVELS=['facile','normale','tosto'];
+$('#bot-plus').onclick=addBot;
+$('#bot-minus').onclick=removeBot;
+$('#bot-level').onclick=()=>{
+  botLevel=LEVELS[(LEVELS.indexOf(botLevel)+1)%3];
+  keep('uct_botlv',botLevel);
+  if(G) G.P.forEach(p=>{ if(p.bot) p.level=botLevel; });
+  $('#bot-level').textContent=botLevel;
+  if(G) pushAll();
+};
+function guestInit(){
+  ME.host=false; ME.id=NET.me;
+  setGuestHandlers();
+  NET.onfail=m=>{
+    try{ NET.bye(); }catch(e){}
+    NET=null;
+    // si torna dove si era entrati, con la password già nel campo da correggere
+    if(ROOM){ $('#joinroom').textContent=ROOM; $('#jpass').value=ME.pass||'';
+      $('#joinerr').textContent=m; show('sc-join'); }
+    else { $('#homeerr').textContent=m; show('sc-home'); }
+  };
+  ensureGuestLoops();
+}
+// i controlli da ospite: partono una volta sola, e servono anche all'host
+// che viene retrocesso
+function ensureGuestLoops(){
+  if(guestLoops) return;
+  guestLoops=true;
+  // battito verso l'host: senza, un ospite che perde la rete resterebbe
+  // "connesso" per sempre e il suo turno bloccherebbe la partita
+  setInterval(()=>{
+    if(ME.host||!NET) return;
+    const h=[...NET.links.keys()][0]; if(h) NET.send(h,{t:'ping'});
+  },5000);
+  let tick=Date.now(), wasOnline=true;
+  setInterval(()=>{
+    const now=Date.now(), gap=now-tick; tick=now;
+    if(ME.host||!NET||!VIEW||!lastHeard) return;
+    // eravamo noi in pausa (telefono in tasca): l'host non c'entra
+    if(gap>8000){ lastHeard=now; return; }
+    // Siamo noi offline? Allora NON si subentra: il problema potremmo essere
+    // noi, e prendere la partita vorrebbe dire riportarla indietro alla nostra
+    // copia vecchia, buttando le mosse fatte dagli altri nel frattempo.
+    if(!NET.pool.healthy()){ wasOnline=false; status('sei offline'); return; }
+    if(!wasOnline){
+      // appena tornati: si cerca l'host attuale invece di dichiararlo morto
+      wasOnline=true; lastHeard=now;
+      for(const id of [...NET.links.keys()]) NET._drop(id);
+      hostGone=0;                   // chiudere noi il collegamento non è un addio dell'host
+      NET.rehello(); return;
+    }
+    const silent=now-lastHeard;
+    if(silent>12000) status('host non raggiungibile');
+    if(VIEW.phase==='lobby'||VIEW.handover===false||!backup) return;
+    // chi subentra lo decide l'ordine al tavolo: tutti arrivano alla stessa risposta
+    const rank=successorsOf(VIEW.players,VIEW.host).indexOf(ME.id);
+    if(rank<0||rank>1) return;
+    const wait = hostGone ? rank*8000 : HANDOVER+rank*10000;
+    if(silent>wait) promote();
+  },2000);
+}
+function setGuestHandlers(){
+  NET.onpeer=(id,name,gone)=>{
+    if(gone){ if(VIEW&&id===VIEW.host) hostGone=Date.now(); return; }
+    NET.send(id,{t:'join',name:ME.name});
+  };
+  NET.onnewhost=onNewHost;
+  NET.ondata=(from,msg)=>{
+    if(msg.t==='backup'){ backup=msg.s; return; }
+    if(msg.t==='state'){
+      if((msg.epoch||0)<curEpoch) return;           // stato di un host superato
+      if(msg.seq&&msg.seq<lastSeq) return;          // scarta gli stati arretrati
+      curEpoch=msg.epoch||0;
+      lastSeq=msg.seq||0; lastHeard=Date.now(); VIEW=msg;
+      if(VIEW.phase==='lobby') renderLobby(); else renderAll();
+    }
+    else if(msg.t==='err') toast(msg.m);
+  };
+}
+function act(o){
+  if(ME.host) NET.ondata(ME.id,o);
+  else{ const h=[...NET.links.keys()][0]; if(h) NET.send(h,o); else toast('non sei connesso all\'host'); }
+}
+
+function cardEl(c,cls){
+  const d=document.createElement('div');
+  d.className='card '+c.c+(cls?' '+cls:'');
+  const l=LBL[c.v]||c.v;
+  d.innerHTML='<span class="cnr tl">'+l+'</span><span class="big">'+l+'</span><span class="cnr br">'+l+'</span>';
+  return d;
+}
+function btn(t,fn,cls){ const b=document.createElement('button');
+  b.className='btn sm '+(cls||''); b.textContent=t; b.onclick=fn; return b; }
+
+/* Mazzetto di carte sotto ogni giocatore: un piccolo ventaglio, come la mano
+   vera. L'apertura e il passo si saturano, così cresce fino a un massimo e
+   poi si infittisce senza mai sfondare il riquadro.                        */
+const FAN_MAX=18, X_SPREAD=32, ARC_MAX=40;
+function stackHTML(n){
+  if(!n) return '<div class="stack"></div>';
+  const m=Math.min(n,FAN_MAX);
+  const arc=Math.min(ARC_MAX,m*9);
+  const aStep=m>1?arc/(m-1):0;
+  const xStep=m>1?Math.min(5,X_SPREAD/(m-1)):0;
+  let h='<div class="stack'+(n===1?' last':(n<=3?' low':''))+'">';
+  for(let i=0;i<m;i++){
+    const k=i-(m-1)/2;
+    h+='<i style="z-index:'+(i+1)+';transform:translateX(calc(-50% + '+
+       (k*xStep).toFixed(1)+'px)) rotate('+(k*aStep).toFixed(1)+'deg)"></i>';
+  }
+  return h+'</div>';
+}
+
+function renderLobby(){
+  show('sc-lobby');
+  const ps = VIEW?VIEW.players : (G?G.P:[]);
+  const L=$('#lobbylist'); L.innerHTML='';
+  ps.forEach(p=>{
+    const r=document.createElement('div'); r.className='prow';
+    r.innerHTML='<span class="dot'+(p.conn===false?' off':'')+'"></span>'+esc(p.name)+
+      (p.id===ME.id?'<span class="tag">tu</span>':(p.bot?'<span class="tag">computer</span>':''));
+    L.appendChild(r);
+  });
+  $('#opts').style.display=ME.host?'flex':'none';
+  $('#b-start').style.display=ME.host?'block':'none';
+  $('#b-start').disabled=ps.length<2;
+  $('#botn').textContent=String(ps.filter(p=>p.bot).length);
+  $('#bot-level').textContent=botLevel;
+  $('#lobbyhint').textContent = ME.host
+    ? (ps.length<2
+        ? 'Aspetta qualcuno, oppure aggiungi un avversario del computer e gioca subito.'
+        : 'Da 2 a 10 giocatori.')
+    : 'In attesa che l\'host inizi…';
+}
+const setText=(sel,t)=>{ const e=$(sel); if(e.textContent!==t) e.textContent=t; };
+let lastTop=null, lastOpp=[], lastActions=null, lastScores=null;
+
+/* Un riquadro giocatore si ricostruisce solo se qualcosa nel suo contenuto
+   è cambiato: altrimenti il mazzetto a ventaglio verrebbe ridisegnato a ogni
+   aggiornamento, anche quando non è successo niente.                       */
+function renderOpps(){
+  const O=$('#opps');
+  const sigs=VIEW.players.map(p=>{
+    const catchable = p.n===1&&!p.said&&p.id!==VIEW.you&&VIEW.phase==='play';
+    return [p.id,p.name,p.n,p.score,p.conn!==false,p.id===VIEW.turn,catchable].join('|');
+  });
+  if(O.children.length!==sigs.length){ O.innerHTML=''; lastOpp=[]; }
+  sigs.forEach((sig,i)=>{
+    if(lastOpp[i]===sig&&O.children[i]) return;
+    const p=VIEW.players[i];
+    const catchable = p.n===1&&!p.said&&p.id!==VIEW.you&&VIEW.phase==='play';
+    const isNew=!O.children[i];
+    const d=isNew?document.createElement('div'):O.children[i];
+    d.className='opp'+(p.id===VIEW.turn?' turn':'')+(p.conn===false?' off':'');
+    d.innerHTML='<div class="nm">'+(p.id===VIEW.you?'Tu':esc(p.name))+'</div>'+
+      '<div class="cnt">'+p.n+'</div>'+stackHTML(p.n)+
+      '<div class="sc">'+p.score+' pt</div>'+
+      (catchable?'<span class="bang">becca!</span>':'');
+    d.onclick = catchable ? ()=>act({t:'catch',id:p.id}) : null;
+    if(isNew) O.appendChild(d);
+  });
+  lastOpp=sigs;
+}
+
+function renderAll(){
+  if(!VIEW) return;
+  show('sc-game');
+  renderOpps();
+
+  // la carta in tavola si ridisegna solo quando cambia davvero
+  const ts=VIEW.top?VIEW.top.c+'|'+VIEW.top.v:'';
+  if(ts!==lastTop){
+    lastTop=ts;
+    const D=$('#discard'); D.innerHTML='';
+    if(VIEW.top) D.appendChild(cardEl(VIEW.top));
+  }
+  setText('#deckn',VIEW.deck+' carte');
+  $('#swatch').style.background='var(--'+VIEW.color+')';
+  const dh = VIEW.stack>0
+    ? '<span class="stackbadge">+'+VIEW.stack+' in canna</span>'
+    : (VIEW.dir===1?'senso orario ↻':'senso antiorario ↺');
+  if($('#dirn').innerHTML!==dh) $('#dirn').innerHTML=dh;
+  setText('#log',VIEW.log||'');
+
+  const mine = VIEW.turn===VIEW.you && VIEW.phase==='play';
+  setText('#mystatus', !mine ? ''
+    : (VIEW.pending!==null ? 'Gioca la carta pescata o passa'
+    : VIEW.stack>0 ? ('Rispondi con un '+VIEW.stackType+' o pesca '+VIEW.stack)
+    : 'Tocca a te'));
+
+  renderHand(mine);
+
+  // anche i pulsanti si rifanno solo se cambiano: sfarfallavano a ogni stato
+  const asig=[VIEW.phase,mine,VIEW.pending,VIEW.stack,VIEW.hand.length<=2].join('|');
+  if(asig!==lastActions){
+    lastActions=asig;
+    const A=$('#actions'); A.innerHTML='';
+    if(VIEW.phase==='play'){
+      if(mine&&VIEW.pending===null)
+        A.appendChild(btn(VIEW.stack>0?('Pesca '+VIEW.stack):'Pesca',()=>act({t:'draw'})));
+      if(mine&&VIEW.pending!==null) A.appendChild(btn('Passa',()=>act({t:'pass'}),'sec'));
+      if(VIEW.hand.length<=2) A.appendChild(btn('UNO !',()=>act({t:'one'}),'sec'));
+    }
+  }
+  $('#deck').onclick=()=>{ if(mine&&VIEW.pending===null) act({t:'draw'}); };
+
+  if(VIEW.phase==='roundend'||VIEW.phase==='gameover') showScores();
+  else { $('#ov').classList.remove('on'); lastScores=null; }
+}
+/* ------------------------------------------------------- la mano in mano --
+   Tre viste: ventaglio (sovrapposte, si vede la punta), fila, griglia.
+   Nel ventaglio il primo tocco alza la carta, il secondo la gioca: con le
+   carte sovrapposte giocare al primo tocco sarebbe una roulette.           */
+const VIEWS=['fan','fila','griglia'];
+// niente emoji nelle etichette: su alcuni dispositivi diventa un quadratino
+const VIEWLBL={fan:'◗ Ventaglio',fila:'▤ Fila',griglia:'▦ Griglia'};
+let handView=recall('uct_view')||'fan';
+let hints=recall('uct_hints')!=='0';
+let selIdx=null;
+
+// specchio di Game.whyNot: stesse condizioni, altrimenti si accendono carte
+// che poi l'host rifiuta
+function canPlay(c,i){
+  if(!legal(c,VIEW.top,VIEW.color,VIEW.stack,VIEW.stackType)) return false;
+  if(VIEW.pending!==null&&VIEW.pending!==-1&&VIEW.pending!==i) return false;
+  if(VIEW.stack===0&&c.v==='+4'&&VIEW.strict4&&VIEW.hand.some(x=>x.c===VIEW.color)) return false;
+  if(VIEW.stack===0&&c.v==='wild'&&VIEW.strictW&&
+     VIEW.hand.some(x=>x.c!=='w'&&playable(x,VIEW.top,VIEW.color))) return false;
+  return true;
+}
+/* Aggiornamento differenziale: le carte già a schermo vengono riusate e si
+   toccano solo classi e posizione. Ricostruire tutto a ogni stato faceva
+   sfarfallare la mano a ogni mossa altrui e a ogni keepalive.              */
+function renderHand(mine){
+  const H=$('#hand');
+  if(!VIEWS.includes(handView)) handView='fan';
+  const cls='hand '+handView+(hints?'':' noaiuti');
+  if(H.className!==cls) H.className=cls;
+  if(selIdx!==null&&selIdx>=VIEW.hand.length) selIdx=null;
+
+  // chiave stabile per carta: la stessa carta ripetuta prende indici diversi
+  const seen={};
+  const keys=VIEW.hand.map(c=>{ const k=c.c+'|'+c.v; seen[k]=(seen[k]||0)+1; return k+'#'+seen[k]; });
+  const have=new Map();
+  for(const el of [...H.children]) have.set(el.dataset.key,el);
+
+  const list=keys.map((key,i)=>{
+    let el=have.get(key);
+    if(el){ have.delete(key); return el; }
+    el=cardEl(VIEW.hand[i]); el.dataset.key=key; return el;
+  });
+  for(const el of have.values()) el.remove();          // via solo le sparite
+  list.forEach((el,i)=>{ if(H.children[i]!==el) H.insertBefore(el,H.children[i]||null); });
+
+  list.forEach((el,i)=>{
+    const c=VIEW.hand[i], ok=mine&&canPlay(c,i);
+    el.classList.toggle('ok',ok);
+    // quando non tocca a te non si smorza niente: guardi la mano in pace
+    el.classList.toggle('no',!ok&&mine);
+    el.classList.toggle('sel',handView==='fan'&&selIdx===i);
+    el.onclick=()=>{
+      if(suppressClick) return;       // veniamo da uno scorrimento, non da un tocco
+      // a suggerimenti spenti si può tentare: rifiuta l'host, ed è il bello
+      const allowed = ok || (!hints&&mine&&VIEW.phase==='play');
+      if(handView==='fan'&&selIdx!==i){ selIdx=i; renderHand(mine); return; }
+      if(!allowed){ selIdx=null; renderHand(mine); return; }
+      selIdx=null;
+      c.c==='w' ? pickColor(i) : act({t:'play',i});
+    };
+  });
+
+  if(handView==='fan') layoutFan(H);
+  else list.forEach(el=>{ if(el.style.transform){ el.style.transform=''; el.style.zIndex=''; } });
+
+  const vl=VIEWLBL[handView];
+  if($('#b-view').textContent!==vl) $('#b-view').textContent=vl;
+  const hl=hints?'◉ Aiuti: sì':'○ Aiuti: no';
+  if($('#b-hint').textContent!==hl) $('#b-hint').textContent=hl;
+  $('#b-hint').classList.toggle('on',hints);
+}
+let fanGeom=null;
+function layoutFan(H){
+  const cards=[...H.children], n=cards.length;
+  if(!n){ fanGeom=null; return; }
+  // La rotazione avviene attorno a un perno sotto le carte (transform-origin
+  // 50% 115%), quindi allarga il ventaglio da sola: va messa nel conto,
+  // altrimenti con la mano piena le carte escono dallo schermo.
+  const cw=64, ch=96, R=62;
+  const arcDeg=Math.min(30,n*4), arc=arcDeg*Math.PI/180;
+  const half=Math.max(80,H.clientWidth/2-16);
+  const box=(cw*Math.cos(arc/2)+ch*Math.sin(arc/2))/2 + R*Math.sin(arc/2);
+  const xMax=Math.max(0,half-box);
+  const step=n>1?Math.min(30,2*xMax/(n-1)):0;
+  const aStep=n>1?arcDeg/(n-1):0;
+  fanGeom={n,step};
+  cards.forEach((el,i)=>{
+    const k=i-(n-1)/2;
+    // le esterne scendono un po': è l'arco, ma limitato
+    const ang=k*aStep, lift=Math.min(20,k*k*0.9);
+    let x=k*step;
+    // le vicine si scostano dalla carta aperta, così si legge meglio
+    if(selIdx!==null&&n>2&&i!==selIdx) x += (i<selIdx?-6:6);
+    el.style.zIndex=String(i+1);
+    el.style.transform = i===selIdx
+      ? `translateX(calc(-50% + ${x}px)) translateY(${lift-36}px) rotate(0deg) scale(1.08)`
+      : `translateX(calc(-50% + ${x}px)) translateY(${lift}px) rotate(${ang}deg)`;
+  });
+}
+// dal punto toccato allo indice della carta sotto il dito
+function fanIndexAt(H,clientX){
+  if(!fanGeom||!fanGeom.step) return 0;
+  const r=H.getBoundingClientRect();
+  const k=(clientX-(r.left+r.width/2))/fanGeom.step;
+  return Math.max(0,Math.min(fanGeom.n-1,Math.round(k+(fanGeom.n-1)/2)));
+}
+
+/* Scorrimento a dito sul ventaglio: la carta sotto il dito esce e si legge.
+   Al rilascio resta aperta, e il tocco successivo la gioca.                */
+let suppressClick=false;
+(function(){
+  const H=$('#hand');
+  let drag=null;
+  const near=(e)=>{ const i=fanIndexAt(H,e.clientX);
+    if(i!==selIdx){ selIdx=i; layoutFan(H); } };
+  H.addEventListener('pointerdown',e=>{
+    if(handView!=='fan'||!H.children.length) return;
+    drag={x:e.clientX,y:e.clientY,moved:false};
+    H.classList.add('dragging');
+    try{ H.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  H.addEventListener('pointermove',e=>{
+    if(!drag) return;
+    if(!drag.moved&&(Math.abs(e.clientX-drag.x)>7||Math.abs(e.clientY-drag.y)>7)) drag.moved=true;
+    if(drag.moved) near(e);
+  });
+  const end=e=>{
+    if(!drag) return;
+    const moved=drag.moved; drag=null;
+    H.classList.remove('dragging');
+    // dopo un trascinamento il click che segue non deve giocare la carta
+    if(moved){ suppressClick=true; setTimeout(()=>{suppressClick=false;},80); }
+  };
+  H.addEventListener('pointerup',end);
+  H.addEventListener('pointercancel',end);
+})();
+$('#b-view').onclick=()=>{
+  handView=VIEWS[(VIEWS.indexOf(handView)+1)%VIEWS.length];
+  selIdx=null; keep('uct_view',handView);
+  if(VIEW) renderAll();
+};
+$('#b-hint').onclick=()=>{
+  hints=!hints; keep('uct_hints',hints?'1':'0');
+  if(VIEW) renderAll();
+};
+addEventListener('resize',()=>{ if(VIEW&&handView==='fan') layoutFan($('#hand')); });
+
+function pickColor(i){
+  const ov=$('#ov'), p=$('#ovpanel');
+  p.innerHTML='<h2>Scegli il colore</h2><div class="colorpick"></div>';
+  const g=p.querySelector('.colorpick');
+  COLORS.forEach(c=>{
+    const d=document.createElement('div'); d.className='cp';
+    d.style.background='var(--'+c+')';
+    d.onclick=()=>{ ov.classList.remove('on'); act({t:'play',i,color:c}); };
+    g.appendChild(d);
+  });
+  ov.classList.add('on');
+}
+function showScores(){
+  const ov=$('#ov'), p=$('#ovpanel'), over=VIEW.phase==='gameover';
+  // il tabellone si ridisegna solo se cambiano i punteggi, non a ogni keepalive
+  const sig=[VIEW.phase,VIEW.lastWinner,VIEW.players.map(x=>x.id+':'+x.score).join(',')].join('|');
+  if(sig===lastScores){ ov.classList.add('on'); return; }
+  lastScores=sig;
+  const w=VIEW.players.find(x=>x.id===VIEW.lastWinner);
+  p.innerHTML='<h2>'+(over?'🏆 Partita finita':'Mano conclusa')+'</h2>'+
+    '<div class="muted" style="margin:0 auto">'+(w?esc(w.name)+(over?' vince la partita.':' chiude la mano.'):'')+'</div>'+
+    '<table class="scoretab">'+VIEW.players.slice().sort((a,b)=>b.score-a.score)
+      .map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+x.score+'</td></tr>').join('')+'</table>';
+  if(ME.host){
+    const b=btn(over?'Nuova partita':'Mano successiva',()=>{
+      if(over) G.P.forEach(x=>x.score=0);
+      G.startRound(); pushAll();
+    });
+    b.style.cssText='margin-top:16px;width:100%'; p.appendChild(b);
+  }else{
+    const d=document.createElement('div'); d.className='muted';
+    d.style.marginTop='14px'; d.textContent='In attesa dell\'host…'; p.appendChild(d);
+  }
+  ov.classList.add('on');
+}
+
+/* ------------------------------------------------------------------- boot */
+const inviteUrl=room=>location.origin+location.pathname+'#r='+room;
+// accetta anche un indirizzo incollato senza codice stanza: il #r= lo aggiungo io
+function inviteFinal(){
+  let u=($('#invite').value||'').trim();
+  if(!u) return '';
+  if(!/#r=/i.test(u)) u=u.replace(/#.*$/,'')+'#r='+ROOM;
+  return u;
+}
+function refreshQR(){
+  const u=inviteFinal(), good=/^https?:\/\/[^\s]+$/i.test(u);
+  $('#qr').style.display=good?'block':'none';
+  $('#qrnote').style.display=good?'none':'flex';
+  if(good) try{ drawQR($('#qr'),u,4); }catch(e){ $('#qr').style.display='none'; $('#qrnote').style.display='flex'; }
+}
+$('#invite').addEventListener('input',refreshQR);
+$('#invite').addEventListener('change',()=>{ const u=inviteFinal(); if(u) $('#invite').value=u; refreshQR(); });
+
+async function go(room,pass,isHost){
+  ROOM=room; ME.pass=pass;
+  $('#homeerr').textContent=''; $('#joinerr').textContent='';
+  keep('uct_nick',ME.name);
+  NET=new Net(room,pass,isHost); NET.onstatus=status;
+  status('connessione…');
+  if(isHost) hostInit(); else guestInit();
+  try{ await NET.start(); }
+  catch(e){
+    NET=null;
+    const msg='Nessun canale raggiungibile. Rete bloccata o sei offline?';
+    if(isHost){ $('#homeerr').textContent=msg; show('sc-home'); }
+    else { $('#joinroom').textContent=room; $('#joinerr').textContent=msg; show('sc-join'); }
+    return;
+  }
+  keep('uct_pass',pass); keep('uct_room',room);
+  $('#roomcode').textContent=room;
+  $('#roompass').textContent=pass;
+  // dentro un iframe l'indirizzo della pagina non è quello pubblico: meglio
+  // un campo vuoto da riempire che un QR che porta da nessuna parte
+  const framed=(window.top!==window.self);
+  $('#invite').value = framed ? '' : inviteUrl(room);
+  $('#framehint').style.display = framed ? 'block' : 'none';
+  refreshQR();
+  renderLobby();
+  history.replaceState(null,'','#r='+room+(isHost?'':'&n='+encodeURIComponent(ME.name)));
+}
+
+const genPass=()=>rid(4);
+$('#createpass').value=genPass();
+
+$('#b-create').onclick=()=>{
+  ME.name=($('#nick').value||'Host').trim().slice(0,12);
+  const p=($('#createpass').value||'').trim().toUpperCase()||genPass();
+  $('#createpass').value=p;
+  go(rid(6),p,true);
+};
+$('#b-join').onclick=()=>{
+  const c=($('#joincode').value||'').trim().toUpperCase();
+  const p=($('#joinpass').value||'').trim().toUpperCase();
+  if(c.length<4){ $('#homeerr').textContent='Codice non valido.'; return; }
+  if(!p){ $('#homeerr').textContent='Serve la password della stanza.'; return; }
+  ME.name=($('#nick').value||'Ospite').trim().slice(0,12);
+  go(c,p,false);
+};
+$('#b-start').onclick=()=>{
+  if(!ME.host||!G) return;
+  const r=lobbyRules();                 // le spunte valgono da questa mano
+  G.strict4=r.strict4; G.strictW=r.strictW; G.freeDraw=r.freeDraw; G.stackRule=r.stack;
+  G.handover=r.handover;
+  G.startRound(); pushAll();
+};
+$('#b-copy').onclick=async()=>{
+  const u=inviteFinal()||inviteUrl(ROOM);
+  try{ await navigator.clipboard.writeText(u); $('#b-copy').textContent='Copiato ✓';
+    setTimeout(()=>$('#b-copy').textContent='Copia link invito',1500); }
+  catch(e){ prompt('Copia questo link:',u); }
+};
+window.addEventListener('beforeunload',()=>{ if(NET) NET.bye(); });
+// il sistema operativo ci dice che la rete è tornata: ricollegarsi subito
+window.addEventListener('online',()=>{ if(NET) NET.pool.reconnectNow(); });
+
+// Schermata d'ingresso: chiede solo nome e password, il codice arriva dal link
+function openJoin(code,msg){
+  ROOM=code;
+  $('#joinroom').textContent=code;
+  if(!$('#jnick').value) $('#jnick').value=recall('uct_nick')||'';
+  $('#jpass').value = recall('uct_room')===code ? recall('uct_pass') : '';
+  $('#joinerr').textContent=msg||'';
+  show('sc-join');
+  ($('#jnick').value?$('#jpass'):$('#jnick')).focus();
+}
+$('#b-join2').onclick=()=>{
+  const p=($('#jpass').value||'').trim().toUpperCase();
+  if(!p){ $('#joinerr').textContent='Serve la password della stanza.'; return; }
+  ME.name=($('#jnick').value||'Ospite').trim().slice(0,12);
+  go(ROOM,p,false);
+};
+$('#b-back').onclick=()=>{ ROOM=null; history.replaceState(null,'',location.pathname); show('sc-home'); };
+$('#jpass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#b-join2').click(); });
+
+(function(){
+  const nick=recall('uct_nick'); if(nick) $('#nick').value=nick;
+  const h=location.hash||'';
+  const r=h.match(/r=([A-Z0-9]{4,8})/i), n=h.match(/n=([^&]*)/);
+  if(!r) return;
+  const code=r[1].toUpperCase();
+  $('#joincode').value=code;
+  const saved=recall('uct_room')===code ? recall('uct_pass') : '';
+  // rientro in partita: nome nel link e password già sul dispositivo
+  if(n&&saved){
+    ME.name=decodeURIComponent(n[1]).slice(0,12)||'Ospite';
+    return go(code,saved,false);
+  }
+  if(n) $('#jnick').value=decodeURIComponent(n[1]).slice(0,12);
+  openJoin(code, n?'Reinserisci la password per rientrare.':'');
+})();
+</script>
+</body>
+</html>
+
+</body></html>
