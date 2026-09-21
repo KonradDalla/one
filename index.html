@@ -93,6 +93,10 @@ input[type=text]:focus{border-color:var(--y)}
 .opp .nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;margin:0 auto}
 .opp .cnt{font-size:20px;font-weight:900;margin-top:1px}
 .opp .sc{font-size:10px;color:var(--dim)}
+/* freccia verso il prossimo di turno: rende visibile il giro a colpo
+   d'occhio, non solo a parole ("senso orario") sotto al tavolo.           */
+.opp .turnarrow{position:absolute;top:50%;right:-12px;transform:translateY(-50%);
+  font-size:13px;font-weight:900;color:var(--y);text-shadow:0 1px 3px #000c;z-index:2}
 /* mazzetto di carte a ventaglio: dorso a righe, bordo bianco e rotazione,
    altrimenti si leggono come barrette e non come carte */
 .stack{position:relative;height:27px;width:100%;margin:2px 0 1px}
@@ -119,7 +123,9 @@ input[type=text]:focus{border-color:var(--y)}
 .card .cnr{position:absolute;font-size:11px;opacity:.92}
 .card .cnr.tl{top:3px;left:5px} .card .cnr.br{bottom:3px;right:5px;transform:rotate(180deg)}
 .card .cshape{position:absolute;top:4px;right:6px;font-size:10px;opacity:.85;text-shadow:0 1px 0 #0004}
-.hand.griglia .card .cshape{display:none}
+/* nella griglia le carte sono piccole ma il simbolo per i daltonici deve
+   restare: prima spariva del tutto proprio lì, sulle carte in mano.        */
+.hand.griglia .card .cshape{top:2px;right:3px;font-size:8px}
 .card.r{background:var(--r)} .card.g{background:var(--g)}
 .card.b{background:var(--b)} .card.y{background:var(--y);color:#3b2f00}
 .card.w{background:conic-gradient(var(--r) 0 25%,var(--b) 0 50%,var(--y) 0 75%,var(--g) 0)}
@@ -128,8 +134,8 @@ input[type=text]:focus{border-color:var(--y)}
 .deckwrap{position:relative;cursor:pointer}
 .deckwrap .n{position:absolute;bottom:-17px;width:100%;text-align:center;font-size:11px;color:var(--dim)}
 .colorbar{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--dim)}
-.swatch{width:17px;height:17px;border-radius:5px;border:2px solid #fff6;
-  display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;line-height:1}
+.swatch{width:22px;height:22px;border-radius:6px;border:2px solid #fff6;
+  display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:#fff;line-height:1}
 .log{font-size:12px;color:var(--dim);height:16px;text-align:center;padding:0 16px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
 .dirn{font-size:12px;color:var(--dim)}
@@ -1912,7 +1918,7 @@ function renderOpps(){
   const O=$('#opps');
   const sigs=VIEW.players.map(p=>{
     const catchable = p.n===1&&!p.said&&p.id!==VIEW.you&&VIEW.phase==='play';
-    return [p.id,p.name,p.n,p.score,p.conn!==false,p.id===VIEW.turn,catchable,LANG].join('|');
+    return [p.id,p.name,p.n,p.score,p.conn!==false,p.id===VIEW.turn,catchable,LANG,VIEW.dir].join('|');
   });
   if(O.children.length!==sigs.length){ O.innerHTML=''; lastOpp=[]; }
   sigs.forEach((sig,i)=>{
@@ -1922,10 +1928,15 @@ function renderOpps(){
     const isNew=!O.children[i];
     const d=isNew?document.createElement('div'):O.children[i];
     d.className='opp'+(p.id===VIEW.turn?' turn':'')+(p.conn===false?' off':'');
+    // la freccia segue l'ordine di seduta, lo stesso che usa il gioco per
+    // passare il turno: si vede a colpo d'occhio chi tocca dopo, non solo
+    // a parole ("senso orario") sotto al tavolo
+    const hasNext=i<sigs.length-1;
     d.innerHTML='<div class="nm">'+(p.id===VIEW.you?t('game.you'):esc(p.name))+'</div>'+
       '<div class="cnt">'+p.n+'</div>'+stackHTML(p.n)+
       '<div class="sc">'+t('game.pts',{n:p.score})+'</div>'+
-      (catchable?'<span class="bang">'+t('game.catchBang')+'</span>':'');
+      (catchable?'<span class="bang">'+t('game.catchBang')+'</span>':'')+
+      (hasNext?'<span class="turnarrow">'+(VIEW.dir===1?'›':'‹')+'</span>':'');
     d.onclick = catchable ? ()=>act({t:'catch',id:p.id}) : null;
     if(isNew) O.appendChild(d);
   });
