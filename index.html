@@ -144,14 +144,17 @@ input[type=text]:focus{border-color:var(--y)}
 .hand .card{cursor:pointer}
 
 /* --- fila: tutte in orizzontale, si scorre --- */
-.hand.fila{display:flex;gap:6px;overflow-x:auto;padding:10px 14px 12px;scrollbar-width:none}
+/* overflow-x:auto forza anche overflow-y ad "auto" (non resta "visible"):
+   senza un margine generoso in alto l'anello delle giocabili viene tagliato
+   dal bordo del contenitore invece di sfumare oltre la carta.              */
+.hand.fila{display:flex;gap:6px;overflow-x:auto;padding:18px 16px 14px;scrollbar-width:none}
 .hand.fila::-webkit-scrollbar{display:none}
 .hand.fila .card{transition:transform .12s}
 .hand.fila .card.ok{transform:translateY(-9px)}
 
 /* --- griglia: tutte visibili insieme, carte piccole --- */
-.hand.griglia{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;
-  padding:8px 12px;max-height:168px;overflow-y:auto;scrollbar-width:none;
+.hand.griglia{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 8px;
+  padding:16px 14px;max-height:200px;overflow-y:auto;scrollbar-width:none;
   --card-w:48px;--card-h:72px}
 .hand.griglia::-webkit-scrollbar{display:none}
 .hand.griglia .card{border-width:2px;border-radius:8px;transition:transform .12s}
@@ -171,9 +174,23 @@ input[type=text]:focus{border-color:var(--y)}
 .hand.fan .card.sel{box-shadow:0 10px 26px #000a;z-index:99!important}
 /* anello + bagliore ben visibili sopra qualunque sfondo di carta: prima era
    un filo di 2px, quasi invisibile sulle carte gialle e sul feltro scuro.
-   Vale in tutte e tre le viste, non solo nel ventaglio.                    */
-.hand .card.ok::after{content:"";position:absolute;inset:-4px;border-radius:12px;
-  box-shadow:0 0 0 3px #fff,0 0 0 6px var(--y),0 0 18px 4px #e8b91fcc;pointer-events:none}
+   Vale in tutte e tre le viste, non solo nel ventaglio. Il raggio del
+   bagliore è pensato apposta per stare dentro il padding di fila/griglia:
+   più largo verrebbe tagliato dal loro overflow.                          */
+.hand .card.ok::after{content:"";position:absolute;inset:-3px;border-radius:12px;
+  box-shadow:0 0 0 2px #fff,0 0 0 5px var(--y),0 0 8px 2px #e8b91fcc;pointer-events:none}
+
+/* frecce che indicano altre carte fuori schermo, nella fila orizzontale:
+   senza, si scorre "alla cieca" e si finisce per passare senza accorgersi
+   che restavano carte giocabili più a destra.                             */
+.handscroll{position:relative}
+.scrollhint{position:absolute;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border-radius:50%;background:var(--y);color:#241d00;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;
+  box-shadow:0 2px 10px #0009;pointer-events:none;opacity:0;transition:opacity .25s;z-index:5}
+.scrollhint.on{opacity:1;animation:pulse 1.4s infinite}
+.scrollhint.left{left:2px}
+.scrollhint.right{right:2px}
 
 /* Le non giocabili si smorzano solo dove non rovinano la lettura: nel
    ventaglio le carte si sovrappongono, e sbiadirle fa sembrare la mano rotta.
@@ -204,6 +221,24 @@ input[type=text]:focus{border-color:var(--y)}
 .langsel{position:fixed;top:calc(4px + env(safe-area-inset-top));left:8px;font-size:10px;
   color:var(--ink);background:#0006;border:1px solid #ffffff2b;border-radius:7px;
   padding:2px 4px;z-index:40}
+
+/* Su schermi larghi il layout pensato per il telefono restava minuscolo in
+   mezzo alla pagina. Qui si allarga tutto (carte, testi, tocco) e si
+   racchiude in un pannello centrato, invece di stirare i singoli elementi
+   su tutta la larghezza: un tavolo da gioco più grande, non più largo.     */
+html{background:radial-gradient(ellipse at 50% 20%,#0f2a1e 0%,#040f0b 70%)}
+@media (min-width:680px){
+  body{max-width:560px;margin:0 auto;box-shadow:0 0 0 1px #ffffff14,0 30px 80px #000a}
+  :root{--card-w:74px;--card-h:110px}
+  h1.logo{font-size:92px}
+  .piles{--card-w:96px;--card-h:142px;gap:28px}
+  .hand.fan{height:190px}
+  .hand.fan .card{bottom:32px}
+  .hand.griglia{--card-w:58px;--card-h:87px}
+  .hand.griglia .card .big{font-size:26px}
+  input[type=text],.btn{max-width:340px}
+  .qrnote,#qr{width:184px;height:184px}
+}
 </style>
 </head>
 <body>
@@ -277,6 +312,7 @@ input[type=text]:focus{border-color:var(--y)}
     </div>
     <button class="btn" id="b-start" data-i18n="lobby.startBtn"></button>
     <div class="muted" id="lobbyhint"></div>
+    <button class="btn sec sm" id="b-leave" data-i18n="lobby.leaveBtn"></button>
   </div>
 </div>
 
@@ -299,7 +335,11 @@ input[type=text]:focus{border-color:var(--y)}
       <button class="chip" id="b-hint"></button>
       <button class="chip" id="b-invite" data-i18n="game.inviteBtn"></button>
     </div>
-    <div class="hand fan" id="hand"></div>
+    <div class="handscroll">
+      <div class="hand fan" id="hand"></div>
+      <div class="scrollhint left" id="hint-left">‹</div>
+      <div class="scrollhint right" id="hint-right">›</div>
+    </div>
   </div>
 </div>
 
@@ -413,7 +453,7 @@ it:{
 'default.hostName':'Host','default.guestName':'Ospite','default.anon':'Anonimo','join.reenterPassword':'Reinserisci la password per rientrare.',
 'game.inviteBtn':'⚲ Invita','overlay.inviteTitle':'Invita un altro giocatore',
 'overlay.inviteHint':'Se qualcuno si è disconnesso, può rientrare con questo codice e questa password, anche a partita in corso.',
-'misc.close':'Chiudi'
+'misc.close':'Chiudi','lobby.leaveBtn':'Lascia la stanza'
 },
 en:{
 'app.title':'One','app.tagline':'one against all',
@@ -480,7 +520,7 @@ en:{
 'default.hostName':'Host','default.guestName':'Guest','default.anon':'Anonymous','join.reenterPassword':'Re-enter the password to rejoin.',
 'game.inviteBtn':'⚲ Invite','overlay.inviteTitle':'Invite another player',
 'overlay.inviteHint':'If someone got disconnected, they can rejoin with this code and password, even mid-game.',
-'misc.close':'Close'
+'misc.close':'Close','lobby.leaveBtn':'Leave room'
 },
 es:{
 'app.title':'One','app.tagline':'uno contra todos',
@@ -547,7 +587,7 @@ es:{
 'default.hostName':'Anfitrión','default.guestName':'Invitado','default.anon':'Anónimo','join.reenterPassword':'Vuelve a introducir la contraseña para reincorporarte.',
 'game.inviteBtn':'⚲ Invitar','overlay.inviteTitle':'Invita a otro jugador',
 'overlay.inviteHint':'Si alguien se ha desconectado, puede volver a entrar con este código y esta contraseña, incluso con la partida en curso.',
-'misc.close':'Cerrar'
+'misc.close':'Cerrar','lobby.leaveBtn':'Salir de la sala'
 },
 fr:{
 'app.title':'One','app.tagline':'un contre tous',
@@ -614,7 +654,7 @@ fr:{
 'default.hostName':'Hôte','default.guestName':'Invité','default.anon':'Anonyme','join.reenterPassword':'Ressaisis le mot de passe pour revenir.',
 'game.inviteBtn':'⚲ Inviter','overlay.inviteTitle':'Invite un autre joueur',
 'overlay.inviteHint':'Si quelqu\'un a été déconnecté, il peut revenir avec ce code et ce mot de passe, même en pleine partie.',
-'misc.close':'Fermer'
+'misc.close':'Fermer','lobby.leaveBtn':'Quitter la salle'
 },
 de:{
 'app.title':'One','app.tagline':'einer gegen alle',
@@ -681,7 +721,7 @@ de:{
 'default.hostName':'Host','default.guestName':'Gast','default.anon':'Anonym','join.reenterPassword':'Gib das Passwort erneut ein, um wieder einzusteigen.',
 'game.inviteBtn':'⚲ Einladen','overlay.inviteTitle':'Weiteren Spieler einladen',
 'overlay.inviteHint':'Falls jemand die Verbindung verloren hat, kann er mit diesem Code und Passwort wieder einsteigen, auch mitten im Spiel.',
-'misc.close':'Schließen'
+'misc.close':'Schließen','lobby.leaveBtn':'Raum verlassen'
 },
 pt:{
 'app.title':'One','app.tagline':'um contra todos',
@@ -748,7 +788,7 @@ pt:{
 'default.hostName':'Anfitrião','default.guestName':'Convidado','default.anon':'Anónimo','join.reenterPassword':'Introduz novamente a senha para voltar a entrar.',
 'game.inviteBtn':'⚲ Convidar','overlay.inviteTitle':'Convida outro jogador',
 'overlay.inviteHint':'Se alguém ficou desconectado, pode voltar a entrar com este código e senha, mesmo a meio do jogo.',
-'misc.close':'Fechar'
+'misc.close':'Fechar','lobby.leaveBtn':'Sair da sala'
 }
 };
 function detectLang(){
@@ -2007,6 +2047,16 @@ function renderHand(mine){
   const hl=t(hints?'hints.on':'hints.off');
   if($('#b-hint').textContent!==hl) $('#b-hint').textContent=hl;
   $('#b-hint').classList.toggle('on',hints);
+  updateScrollHints(H);
+}
+// frecce ‹ › quando ci sono altre carte fuori dallo schermo: solo nella fila,
+// dove lo scorrimento orizzontale altrimenti non si nota affatto
+function updateScrollHints(H){
+  const L=$('#hint-left'), R=$('#hint-right');
+  if(handView!=='fila'){ L.classList.remove('on'); R.classList.remove('on'); return; }
+  const max=H.scrollWidth-H.clientWidth;
+  L.classList.toggle('on', H.scrollLeft>4);
+  R.classList.toggle('on', max>4 && H.scrollLeft<max-4);
 }
 let fanGeom=null;
 function layoutFan(H){
@@ -2014,8 +2064,10 @@ function layoutFan(H){
   if(!n){ fanGeom=null; return; }
   // La rotazione avviene attorno a un perno sotto le carte (transform-origin
   // 50% 115%), quindi allarga il ventaglio da sola: va messa nel conto,
-  // altrimenti con la mano piena le carte escono dallo schermo.
-  const cw=64, ch=96, R=62;
+  // altrimenti con la mano piena le carte escono dallo schermo. Le misure
+  // si leggono dalla carta vera (cambiano con --card-w/--card-h su schermi
+  // larghi), non sono più fisse: altrimenti l'arco sbaglierebbe a desktop.
+  const cw=cards[0].offsetWidth||64, ch=cards[0].offsetHeight||96, R=Math.round(ch*0.645);
   const arcDeg=Math.min(30,n*4), arc=arcDeg*Math.PI/180;
   const half=Math.max(80,H.clientWidth/2-16);
   const box=(cw*Math.cos(arc/2)+ch*Math.sin(arc/2))/2 + R*Math.sin(arc/2);
@@ -2072,6 +2124,7 @@ let suppressClick=false;
   };
   H.addEventListener('pointerup',end);
   H.addEventListener('pointercancel',end);
+  H.addEventListener('scroll',()=>updateScrollHints(H));
 })();
 $('#b-view').onclick=()=>{
   handView=VIEWS[(VIEWS.indexOf(handView)+1)%VIEWS.length];
@@ -2083,7 +2136,7 @@ $('#b-hint').onclick=()=>{
   if(VIEW) renderAll();
 };
 $('#b-invite').onclick=showInviteOverlay;
-addEventListener('resize',()=>{ if(VIEW&&handView==='fan') layoutFan($('#hand')); });
+addEventListener('resize',()=>{ if(!VIEW) return; if(handView==='fan') layoutFan($('#hand')); else updateScrollHints($('#hand')); });
 
 /* Il codice e la password restano visibili solo nella lobby: una volta
    iniziata la mano, chi si disconnette non ha più modo di farseli ridire,
@@ -2246,6 +2299,20 @@ $('#b-join2').onclick=()=>{
 };
 $('#b-back').onclick=()=>{ ROOM=null; history.replaceState(null,'',location.pathname); show('sc-home'); };
 $('#jpass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#b-join2').click(); });
+
+/* Uscire dalla lobby senza lasciare in giro un codice stanza nell'indirizzo:
+   altrimenti al prossimo giro capita di ricaricare la pagina e ritrovarsi
+   rientrati per sbaglio nella stessa stanza vecchia, magari già chiusa.    */
+function leaveRoom(){
+  clearTimeout(botTimer); clearTimeout(catchTimer); clearTimeout(backupTimer);
+  if(NET) NET.bye();
+  NET=null; G=null; VIEW=null; ROOM=null;
+  ME.host=false; ME.pass='';
+  lastSeq=0; lastHeard=0; backup=null; curEpoch=0; hostGone=0;
+  history.replaceState(null,'',location.pathname);
+  show('sc-home');
+}
+$('#b-leave').onclick=leaveRoom;
 
 initLangSel();
 applyI18n();
