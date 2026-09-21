@@ -10,7 +10,7 @@
   --r:#e4443a; --g:#3aa757; --b:#2b7fd4; --y:#e8b91f;
   --felt:#143a2b; --felt2:#0b241b;
   --ink:#f4f1e8; --dim:#94a49b;
-  --card-w:64px; --card-h:96px;
+  --card-w:64px; --card-h:96px; --card-radius:10px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
@@ -91,8 +91,12 @@ input[type=text]:focus{border-color:var(--y)}
 .opp.turn{border-color:var(--y);background:#e8b91f22}
 .opp.off{opacity:.4}
 .opp .nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;margin:0 auto}
+.opp .nm .dot{width:7px;height:7px;display:inline-block;vertical-align:middle;margin-right:3px}
 .opp .cnt{font-size:20px;font-weight:900;margin-top:1px}
 .opp .sc{font-size:10px;color:var(--dim)}
+.opp .hoststar{position:absolute;top:-7px;left:-6px;background:var(--y);color:#241d00;
+  width:16px;height:16px;border-radius:50%;font-size:10px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px #0007}
 /* freccia verso il prossimo di turno: rende visibile il giro a colpo
    d'occhio, non solo a parole ("senso orario") sotto al tavolo.           */
 .opp .turnarrow{position:absolute;top:50%;right:-12px;transform:translateY(-50%);
@@ -114,15 +118,21 @@ input[type=text]:focus{border-color:var(--y)}
 .table{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 /* il mazzo e la carta in tavola sono il punto in cui si guarda: più grandi */
 .piles{display:flex;align-items:center;gap:22px;margin-bottom:16px;--card-w:78px;--card-h:116px}
-.piles .card .big{font-size:36px}
+.piles .card .big{font-size:48px}
 .piles .card .cnr{font-size:13px}
-.card{width:var(--card-w);height:var(--card-h);border-radius:10px;position:relative;
+.card{width:var(--card-w);height:var(--card-h);border-radius:var(--card-radius);position:relative;
   display:flex;align-items:center;justify-content:center;flex:none;
   font-weight:900;color:#fff;box-shadow:0 5px 14px #0007;border:3px solid #fff;user-select:none}
-.card .big{font-size:29px;text-shadow:0 2px 0 #0003}
+/* più vicino alle carte vere: il numero domina la carta, leggermente
+   inclinato, non un numeretto in mezzo a tanto spazio vuoto.               */
+.card .big{font-size:40px;font-style:italic;text-shadow:0 2px 0 #0003}
 .card .cnr{position:absolute;font-size:11px;opacity:.92}
 .card .cnr.tl{top:3px;left:5px} .card .cnr.br{bottom:3px;right:5px;transform:rotate(180deg)}
 .card .cshape{position:absolute;top:4px;right:6px;font-size:10px;opacity:.85;text-shadow:0 1px 0 #0004}
+.card .cwatermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:54px;opacity:.15;color:#fff;pointer-events:none}
+.piles .card .cwatermark{font-size:68px}
+.hand.griglia .card .cwatermark{font-size:32px}
 /* nella griglia le carte sono piccole ma il simbolo per i daltonici deve
    restare: prima spariva del tutto proprio lì, sulle carte in mano.        */
 .hand.griglia .card .cshape{top:2px;right:3px;font-size:8px}
@@ -163,8 +173,8 @@ input[type=text]:focus{border-color:var(--y)}
   padding:16px 14px;max-height:200px;overflow-y:auto;scrollbar-width:none;
   --card-w:48px;--card-h:72px}
 .hand.griglia::-webkit-scrollbar{display:none}
-.hand.griglia .card{border-width:2px;border-radius:8px;transition:transform .12s}
-.hand.griglia .card .big{font-size:21px}
+.hand.griglia .card{--card-radius:8px;border-width:2px;border-radius:var(--card-radius);transition:transform .12s}
+.hand.griglia .card .big{font-size:28px}
 .hand.griglia .card .cnr{display:none}
 .hand.griglia .card.ok{transform:translateY(-6px)}
 
@@ -183,18 +193,26 @@ input[type=text]:focus{border-color:var(--y)}
    Vale in tutte e tre le viste, non solo nel ventaglio. Il raggio del
    bagliore è pensato apposta per stare dentro il padding di fila/griglia:
    più largo verrebbe tagliato dal loro overflow.                          */
-.hand .card.ok::after{content:"";position:absolute;inset:-3px;border-radius:12px;
-  box-shadow:0 0 0 2px #fff,0 0 0 5px var(--y),0 0 8px 2px #e8b91fcc;pointer-events:none}
+/* Il raggio non è un numero a caso: è quello della carta più l'inset, così
+   l'anello resta concentrico invece di sembrare un rettangolo incollato
+   sopra — succedeva con un valore fisso, che non seguiva --card-radius
+   quando cambia (griglia, o le misure più grandi da desktop).             */
+.hand .card.ok::after{content:"";position:absolute;inset:-3px;
+  border-radius:calc(var(--card-radius) + 3px);
+  box-shadow:0 0 0 3px var(--y),0 0 9px 2px #e8b91f99;pointer-events:none}
 
 /* frecce che indicano altre carte fuori schermo, nella fila orizzontale:
    senza, si scorre "alla cieca" e si finisce per passare senza accorgersi
    che restavano carte giocabili più a destra.                             */
 .handscroll{position:relative}
+/* cliccabile: non è solo un indizio, scorre davvero al tocco. Utile a chi
+   non sa (o non può, su desktop senza trackpad) scorrere la fila a dito.   */
 .scrollhint{position:absolute;top:50%;transform:translateY(-50%);
-  width:26px;height:26px;border-radius:50%;background:var(--y);color:#241d00;
-  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;
-  box-shadow:0 2px 10px #0009;pointer-events:none;opacity:0;transition:opacity .25s;z-index:5}
-.scrollhint.on{opacity:1;animation:pulse 1.4s infinite}
+  width:30px;height:30px;border-radius:50%;background:var(--y);color:#241d00;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;
+  box-shadow:0 2px 10px #0009;cursor:pointer;opacity:0;pointer-events:none;
+  transition:opacity .25s;z-index:5}
+.scrollhint.on{opacity:1;pointer-events:auto;animation:pulse 1.4s infinite}
 .scrollhint.left{left:2px}
 .scrollhint.right{right:2px}
 
@@ -237,11 +255,13 @@ html{background:radial-gradient(ellipse at 50% 20%,#0f2a1e 0%,#040f0b 70%)}
   body{max-width:560px;margin:0 auto;box-shadow:0 0 0 1px #ffffff14,0 30px 80px #000a}
   :root{--card-w:74px;--card-h:110px}
   h1.logo{font-size:92px}
+  .card .big{font-size:46px}
   .piles{--card-w:96px;--card-h:142px;gap:28px}
+  .piles .card .big{font-size:58px}
   .hand.fan{height:190px}
   .hand.fan .card{bottom:32px}
   .hand.griglia{--card-w:58px;--card-h:87px}
-  .hand.griglia .card .big{font-size:26px}
+  .hand.griglia .card .big{font-size:34px}
   input[type=text],.btn{max-width:340px}
   .qrnote,#qr{width:184px;height:184px}
 }
@@ -308,6 +328,8 @@ html{background:radial-gradient(ellipse at 50% 20%,#0f2a1e 0%,#040f0b 70%)}
         <span data-i18n="opt.stack"></span></label>
       <label class="opt"><input type="checkbox" id="o-handover" checked>
         <span data-i18n="opt.handover"></span></label>
+      <label class="opt"><input type="checkbox" id="o-customwild">
+        <span data-i18n="opt.customwild"></span></label>
       <div class="botrow">
         <span data-i18n="lobby.botOpponents"></span>
         <button class="chip" id="bot-minus">−</button>
@@ -459,7 +481,18 @@ it:{
 'default.hostName':'Host','default.guestName':'Ospite','default.anon':'Anonimo','join.reenterPassword':'Reinserisci la password per rientrare.',
 'game.inviteBtn':'⚲ Invita','overlay.inviteTitle':'Invita un altro giocatore',
 'overlay.inviteHint':'Se qualcuno si è disconnesso, può rientrare con questo codice e questa password, anche a partita in corso.',
-'misc.close':'Chiudi','lobby.leaveBtn':'Lascia la stanza'
+'misc.close':'Chiudi','lobby.leaveBtn':'Lascia la stanza',
+'opt.customwild':'Includi la Carta Bianca (personalizzabile)','card.custom':'Carta Bianca',
+'overlay.customTitle':'Scegli l\'effetto','overlay.chooseTarget':'Scegli il giocatore',
+'custom.drawN':'Un giocatore pesca N carte','custom.drawUntilColor':'Un giocatore pesca finché non esce un colore',
+'custom.swapHands':'Scambia la mano con un giocatore','custom.rotateHands':'Ruota tutte le mani',
+'custom.reshuffleAll':'Rimescola e ridistribuisci tutte le mani',
+'custom.dirRight':'verso destra','custom.dirLeft':'verso sinistra',
+'log.customDrawN':'{name} fa pescare {n} carte a {target}.',
+'log.customDrawUntil':'{name} fa pescare a {target} finché non esce un {color} ({n} carte).',
+'log.customSwap':'{name} scambia la mano con {target}.',
+'log.customRotate':'{name} fa ruotare tutte le mani.',
+'log.customReshuffle':'{name} rimescola e ridistribuisce tutte le mani.'
 },
 en:{
 'app.title':'One','app.tagline':'one against all',
@@ -526,7 +559,18 @@ en:{
 'default.hostName':'Host','default.guestName':'Guest','default.anon':'Anonymous','join.reenterPassword':'Re-enter the password to rejoin.',
 'game.inviteBtn':'⚲ Invite','overlay.inviteTitle':'Invite another player',
 'overlay.inviteHint':'If someone got disconnected, they can rejoin with this code and password, even mid-game.',
-'misc.close':'Close','lobby.leaveBtn':'Leave room'
+'misc.close':'Close','lobby.leaveBtn':'Leave room',
+'opt.customwild':'Include the Wild Card (customizable)','card.custom':'Wild Card',
+'overlay.customTitle':'Choose the effect','overlay.chooseTarget':'Choose the player',
+'custom.drawN':'A player draws N cards','custom.drawUntilColor':'A player draws until a color comes up',
+'custom.swapHands':'Swap hands with a player','custom.rotateHands':'Rotate all hands',
+'custom.reshuffleAll':'Reshuffle and redeal all hands',
+'custom.dirRight':'to the right','custom.dirLeft':'to the left',
+'log.customDrawN':'{name} makes {target} draw {n} cards.',
+'log.customDrawUntil':'{name} makes {target} draw until a {color} comes up ({n} cards).',
+'log.customSwap':'{name} swaps hands with {target}.',
+'log.customRotate':'{name} rotates everyone\'s hand.',
+'log.customReshuffle':'{name} reshuffles and redeals everyone\'s hand.'
 },
 es:{
 'app.title':'One','app.tagline':'uno contra todos',
@@ -593,7 +637,18 @@ es:{
 'default.hostName':'Anfitrión','default.guestName':'Invitado','default.anon':'Anónimo','join.reenterPassword':'Vuelve a introducir la contraseña para reincorporarte.',
 'game.inviteBtn':'⚲ Invitar','overlay.inviteTitle':'Invita a otro jugador',
 'overlay.inviteHint':'Si alguien se ha desconectado, puede volver a entrar con este código y esta contraseña, incluso con la partida en curso.',
-'misc.close':'Cerrar','lobby.leaveBtn':'Salir de la sala'
+'misc.close':'Cerrar','lobby.leaveBtn':'Salir de la sala',
+'opt.customwild':'Incluir la Carta Blanca (personalizable)','card.custom':'Carta Blanca',
+'overlay.customTitle':'Elige el efecto','overlay.chooseTarget':'Elige el jugador',
+'custom.drawN':'Un jugador roba N cartas','custom.drawUntilColor':'Un jugador roba hasta que sale un color',
+'custom.swapHands':'Intercambia la mano con un jugador','custom.rotateHands':'Rota todas las manos',
+'custom.reshuffleAll':'Reparte de nuevo todas las manos',
+'custom.dirRight':'hacia la derecha','custom.dirLeft':'hacia la izquierda',
+'log.customDrawN':'{name} hace que {target} robe {n} cartas.',
+'log.customDrawUntil':'{name} hace que {target} robe hasta que sale un {color} ({n} cartas).',
+'log.customSwap':'{name} intercambia la mano con {target}.',
+'log.customRotate':'{name} hace rotar todas las manos.',
+'log.customReshuffle':'{name} reparte de nuevo todas las manos.'
 },
 fr:{
 'app.title':'One','app.tagline':'un contre tous',
@@ -660,7 +715,18 @@ fr:{
 'default.hostName':'Hôte','default.guestName':'Invité','default.anon':'Anonyme','join.reenterPassword':'Ressaisis le mot de passe pour revenir.',
 'game.inviteBtn':'⚲ Inviter','overlay.inviteTitle':'Invite un autre joueur',
 'overlay.inviteHint':'Si quelqu\'un a été déconnecté, il peut revenir avec ce code et ce mot de passe, même en pleine partie.',
-'misc.close':'Fermer','lobby.leaveBtn':'Quitter la salle'
+'misc.close':'Fermer','lobby.leaveBtn':'Quitter la salle',
+'opt.customwild':'Inclure la Carte Blanche (personnalisable)','card.custom':'Carte Blanche',
+'overlay.customTitle':'Choisis l\'effet','overlay.chooseTarget':'Choisis le joueur',
+'custom.drawN':'Un joueur pioche N cartes','custom.drawUntilColor':'Un joueur pioche jusqu\'à une couleur',
+'custom.swapHands':'Échange sa main avec un joueur','custom.rotateHands':'Fait tourner toutes les mains',
+'custom.reshuffleAll':'Remélange et redistribue toutes les mains',
+'custom.dirRight':'vers la droite','custom.dirLeft':'vers la gauche',
+'log.customDrawN':'{name} fait piocher {n} cartes à {target}.',
+'log.customDrawUntil':'{name} fait piocher {target} jusqu\'à une {color} ({n} cartes).',
+'log.customSwap':'{name} échange sa main avec {target}.',
+'log.customRotate':'{name} fait tourner toutes les mains.',
+'log.customReshuffle':'{name} remélange et redistribue toutes les mains.'
 },
 de:{
 'app.title':'One','app.tagline':'einer gegen alle',
@@ -727,7 +793,18 @@ de:{
 'default.hostName':'Host','default.guestName':'Gast','default.anon':'Anonym','join.reenterPassword':'Gib das Passwort erneut ein, um wieder einzusteigen.',
 'game.inviteBtn':'⚲ Einladen','overlay.inviteTitle':'Weiteren Spieler einladen',
 'overlay.inviteHint':'Falls jemand die Verbindung verloren hat, kann er mit diesem Code und Passwort wieder einsteigen, auch mitten im Spiel.',
-'misc.close':'Schließen','lobby.leaveBtn':'Raum verlassen'
+'misc.close':'Schließen','lobby.leaveBtn':'Raum verlassen',
+'opt.customwild':'Weiße Karte einschließen (anpassbar)','card.custom':'Weiße Karte',
+'overlay.customTitle':'Effekt wählen','overlay.chooseTarget':'Spieler wählen',
+'custom.drawN':'Ein Spieler zieht N Karten','custom.drawUntilColor':'Ein Spieler zieht, bis eine Farbe kommt',
+'custom.swapHands':'Tauscht die Hand mit einem Spieler','custom.rotateHands':'Dreht alle Hände weiter',
+'custom.reshuffleAll':'Mischt und verteilt alle Hände neu',
+'custom.dirRight':'nach rechts','custom.dirLeft':'nach links',
+'log.customDrawN':'{name} lässt {target} {n} Karten ziehen.',
+'log.customDrawUntil':'{name} lässt {target} ziehen, bis eine {color} kommt ({n} Karten).',
+'log.customSwap':'{name} tauscht die Hand mit {target}.',
+'log.customRotate':'{name} lässt alle Hände weiterdrehen.',
+'log.customReshuffle':'{name} mischt und verteilt alle Hände neu.'
 },
 pt:{
 'app.title':'One','app.tagline':'um contra todos',
@@ -794,7 +871,18 @@ pt:{
 'default.hostName':'Anfitrião','default.guestName':'Convidado','default.anon':'Anónimo','join.reenterPassword':'Introduz novamente a senha para voltar a entrar.',
 'game.inviteBtn':'⚲ Convidar','overlay.inviteTitle':'Convida outro jogador',
 'overlay.inviteHint':'Se alguém ficou desconectado, pode voltar a entrar com este código e senha, mesmo a meio do jogo.',
-'misc.close':'Fechar','lobby.leaveBtn':'Sair da sala'
+'misc.close':'Fechar','lobby.leaveBtn':'Sair da sala',
+'opt.customwild':'Incluir a Carta Branca (personalizável)','card.custom':'Carta Branca',
+'overlay.customTitle':'Escolhe o efeito','overlay.chooseTarget':'Escolhe o jogador',
+'custom.drawN':'Um jogador compra N cartas','custom.drawUntilColor':'Um jogador compra até sair uma cor',
+'custom.swapHands':'Troca a mão com um jogador','custom.rotateHands':'Roda todas as mãos',
+'custom.reshuffleAll':'Volta a baralhar e distribuir todas as mãos',
+'custom.dirRight':'para a direita','custom.dirLeft':'para a esquerda',
+'log.customDrawN':'{name} faz {target} comprar {n} cartas.',
+'log.customDrawUntil':'{name} faz {target} comprar até sair uma {color} ({n} cartas).',
+'log.customSwap':'{name} troca a mão com {target}.',
+'log.customRotate':'{name} faz rodar todas as mãos.',
+'log.customReshuffle':'{name} volta a baralhar e distribuir todas as mãos.'
 }
 };
 function detectLang(){
@@ -814,7 +902,8 @@ function colorName(c){ return t('color.'+c); }
 function kindName(v){ return v==='skip'?t('card.skip'):v==='rev'?t('card.reverse'):v==='+2'?t('card.drawtwo'):v; }
 function cardFullName(card){
   if(!card) return '';
-  return card.c==='w' ? (card.v==='+4'?t('card.drawfour'):t('card.wild')) : colorName(card.c)+' '+kindName(card.v);
+  if(card.c!=='w') return colorName(card.c)+' '+kindName(card.v);
+  return card.v==='+4'?t('card.drawfour'):card.v==='custom'?t('card.custom'):t('card.wild');
 }
 // i log e gli errori di rete arrivano come {k,p} grezzi: si traducono qui,
 // sul dispositivo di chi guarda, non su quello che li ha generati
@@ -1247,12 +1336,13 @@ class Net{
           + 4 cambia colore + 4 pesca quattro           = 108
    Punti : numeri = valore, azioni = 20, jolly = 50. Si arriva a 500.       */
 const COLORS=['r','g','b','y'];
-const LBL={skip:'⊘',rev:'⇄','+2':'+2',wild:'★','+4':'+4'};
+const LBL={skip:'⊘',rev:'⇄','+2':'+2',wild:'★','+4':'+4',custom:'⇌'};
 // un simbolo per colore, non solo la tinta: chi non distingue rosso e verde
 // (la forma più comune di daltonismo) legge comunque la carta
 const CSHAPE={r:'●',g:'■',b:'◆',y:'▲'};
 
-function buildDeck(){
+function buildDeck(opts){
+  opts=opts||{};
   const d=[];
   for(const c of COLORS){
     d.push({c,v:'0'});
@@ -1260,6 +1350,9 @@ function buildDeck(){
     for(const v of ['skip','rev','+2']){ d.push({c,v}); d.push({c,v}); }
   }
   for(let i=0;i<4;i++){ d.push({c:'w',v:'wild'}); d.push({c:'w',v:'+4'}); }
+  // la carta bianca personalizzabile dei mazzi ufficiali recenti: qui è
+  // una sola, con un menu di effetti al posto della penna per scriverci sopra
+  if(opts.customWild) d.push({c:'w',v:'custom'});
   return shuffle(d);
 }
 function shuffle(a){
@@ -1291,6 +1384,7 @@ class Game{
     this.freeDraw=opts.freeDraw!==false;    // dopo la pescata giochi ciò che vuoi
     this.stackRule=!!opts.stack;
     this.handover=opts.handover!==false;  // copia della partita ai successori
+    this.customWild=!!opts.customWild;    // carta bianca personalizzabile
     this.stack=0; this.stackType=null;
   }
   /* Unico posto che decide se una carta si può giocare: lo usa l'host per
@@ -1302,7 +1396,7 @@ class Game{
                           : {k:'err.notPlayable'};
     if(this.stack===0&&c.v==='+4'&&this.strict4&&p.hand.some(x=>x.c===this.color))
       return {k:'err.stillHaveColor',p:{color:this.color}};
-    if(this.stack===0&&c.v==='wild'&&this.strictW&&
+    if(this.stack===0&&(c.v==='wild'||c.v==='custom')&&this.strictW&&
        p.hand.some(x=>x.c!=='w'&&playable(x,this.top(),this.color)))
       return {k:'err.haveOtherPlayable'};
     return null;
@@ -1340,7 +1434,7 @@ class Game{
   say(k,p){ this.log.push({k,p}); if(this.log.length>10) this.log.shift(); }
 
   startRound(){
-    this.deck=buildDeck(); this.discard=[]; this.stack=0; this.stackType=null;
+    this.deck=buildDeck({customWild:this.customWild}); this.discard=[]; this.stack=0; this.stackType=null;
     this.P.forEach(p=>{ p.hand=this.deck.splice(0,7); p.said=false; });
     let first;
     do{ first=this.deck.shift(); if(first.c==='w') this.deck.push(first); }while(first.c==='w');
@@ -1386,7 +1480,7 @@ class Game{
   give(p,n){ for(let i=0;i<n;i++){ this.reshuffle(); if(!this.deck.length) break; p.hand.push(this.deck.shift()); }
     if(n>0) p.said=false; }
 
-  play(id,idx,chosen){
+  play(id,idx,chosen,custom){
     if(this.phase!=='play') return {k:'err.notActive'};
     const p=this.cur();
     if(p.id!==id) return {k:'err.notYourTurn'};
@@ -1405,6 +1499,11 @@ class Game{
     this.color = card.c==='w' ? (COLORS.includes(chosen)?chosen:'r') : card.c;
     if(card.c==='w') this.say('log.playWild',{name:p.name,card,color:this.color});
     else this.say('log.play',{name:p.name,card});
+
+    // l'effetto scelto per la carta bianca si applica prima di controllare
+    // se la mano è finita: può cambiarla (scambio, ridistribuzione), e la
+    // vittoria deve guardare la mano DOPO l'effetto, non prima.
+    if(card.v==='custom') this.applyCustomEffect(p,custom);
 
     if(p.hand.length===0){ this.endRound(p); return null; }
     if(p.hand.length!==1) p.said=false;
@@ -1431,6 +1530,48 @@ class Game{
     else this.next();
     this.skipDead();
     return null;
+  }
+  /* Gli effetti della carta bianca: input grezzo dalla rete, quindi tutto
+     va verificato di nuovo qui (id validi, numeri nei limiti) — un client
+     rotto o malizioso non deve poter piantare la partita degli altri.      */
+  applyCustomEffect(p,custom){
+    if(!custom||typeof custom!=='object') return;
+    const target=this.P.find(x=>x.id===custom.target);
+    if(custom.effect==='drawN'&&target){
+      const n=Math.max(1,Math.min(8,parseInt(custom.n,10)||1));
+      this.give(target,n);
+      this.say('log.customDrawN',{name:p.name,target:target.name,n});
+    }
+    else if(custom.effect==='drawUntilColor'&&target){
+      const col=COLORS.includes(custom.color)?custom.color:this.color;
+      let n=0, guard=0;
+      while(guard++<25){
+        this.reshuffle();
+        if(!this.deck.length) break;
+        const c=this.deck.shift(); target.hand.push(c); n++;
+        if(c.c===col) break;
+      }
+      target.said=false;
+      this.say('log.customDrawUntil',{name:p.name,target:target.name,color:col,n});
+    }
+    else if(custom.effect==='swapHands'&&target&&target!==p){
+      const tmp=p.hand; p.hand=target.hand; target.hand=tmp;
+      p.said=false; target.said=false;
+      this.say('log.customSwap',{name:p.name,target:target.name});
+    }
+    else if(custom.effect==='rotateHands'){
+      const n=this.P.length; if(n<2) return;
+      const dir=custom.dir===-1?-1:1;
+      const hands=this.P.map(x=>x.hand);
+      this.P.forEach((x,i)=>{ x.hand=hands[(i-dir+n)%n]; x.said=false; });
+      this.say('log.customRotate',{name:p.name});
+    }
+    else if(custom.effect==='reshuffleAll'){
+      const sizes=this.P.map(x=>x.hand.length);
+      const pool=shuffle(this.P.reduce((a,x)=>a.concat(x.hand),[]));
+      this.P.forEach((x,i)=>{ x.hand=pool.splice(0,sizes[i]); x.said=false; });
+      this.say('log.customReshuffle',{name:p.name});
+    }
   }
   draw(id){
     if(this.phase!=='play') return {k:'err.notActive'};
@@ -1582,7 +1723,8 @@ const lobbyRules=()=>({
   strictW:$('#o-strictw').checked,
   freeDraw:$('#o-freedraw').checked,
   stack:$('#o-stack').checked,
-  handover:$('#o-handover').checked
+  handover:$('#o-handover').checked,
+  customWild:$('#o-customwild').checked
 });
 
 /* ------------------------------------------------ passaggio di consegne --
@@ -1626,7 +1768,7 @@ function becomeHost(){
     if(msg.t==='ping'){ if(who&&!who.conn) pushAll(); return; }
     let err=null;
     if(msg.t==='join'){ G.add(from,msg.name,msg.dev); pushAll(); return; }
-    if(msg.t==='play') err=G.play(from,msg.i,msg.color);
+    if(msg.t==='play') err=G.play(from,msg.i,msg.color,msg.custom);
     else if(msg.t==='draw') err=G.draw(from);
     else if(msg.t==='pass') err=G.pass(from);
     else if(msg.t==='one') err=G.callOne(from);
@@ -1861,7 +2003,11 @@ function cardEl(c,cls){
   const d=document.createElement('div');
   d.className='card '+c.c+(cls?' '+cls:'');
   const l=LBL[c.v]||c.v, shape=CSHAPE[c.c];
-  d.innerHTML='<span class="cnr tl">'+l+'</span><span class="big">'+l+'</span><span class="cnr br">'+l+'</span>'+
+  // la forma grande e sbiadita dietro al numero è la stessa usata per i
+  // daltonici in un angolo: fa anche da "logo" della carta, senza scimmiottare
+  // l'ovale dell'originale. Deve stare prima nel markup per restare dietro.
+  d.innerHTML=(shape?'<span class="cwatermark">'+shape+'</span>':'')+
+    '<span class="cnr tl">'+l+'</span><span class="big">'+l+'</span><span class="cnr br">'+l+'</span>'+
     (shape?'<span class="cshape">'+shape+'</span>':'');
   return d;
 }
@@ -1918,7 +2064,7 @@ function renderOpps(){
   const O=$('#opps');
   const sigs=VIEW.players.map(p=>{
     const catchable = p.n===1&&!p.said&&p.id!==VIEW.you&&VIEW.phase==='play';
-    return [p.id,p.name,p.n,p.score,p.conn!==false,p.id===VIEW.turn,catchable,LANG,VIEW.dir].join('|');
+    return [p.id,p.name,p.n,p.score,p.conn!==false,p.id===VIEW.turn,catchable,LANG,VIEW.dir,p.id===VIEW.host].join('|');
   });
   if(O.children.length!==sigs.length){ O.innerHTML=''; lastOpp=[]; }
   sigs.forEach((sig,i)=>{
@@ -1932,9 +2078,13 @@ function renderOpps(){
     // passare il turno: si vede a colpo d'occhio chi tocca dopo, non solo
     // a parole ("senso orario") sotto al tavolo
     const hasNext=i<sigs.length-1;
-    d.innerHTML='<div class="nm">'+(p.id===VIEW.you?t('game.you'):esc(p.name))+'</div>'+
+    // chi è l'host e chi è online non si vedeva affatto qui: solo nella
+    // lobby. Un pallino di stato e una stellina bastano, niente di più.
+    d.innerHTML='<div class="nm"><span class="dot'+(p.conn===false?' off':'')+'"></span>'+
+      (p.id===VIEW.you?t('game.you'):esc(p.name))+'</div>'+
       '<div class="cnt">'+p.n+'</div>'+stackHTML(p.n)+
       '<div class="sc">'+t('game.pts',{n:p.score})+'</div>'+
+      (p.id===VIEW.host?'<span class="hoststar" title="'+t('default.hostName')+'">★</span>':'')+
       (catchable?'<span class="bang">'+t('game.catchBang')+'</span>':'')+
       (hasNext?'<span class="turnarrow">'+(VIEW.dir===1?'›':'‹')+'</span>':'');
     d.onclick = catchable ? ()=>act({t:'catch',id:p.id}) : null;
@@ -2046,7 +2196,7 @@ function renderHand(mine){
       if(handView==='fan'&&selIdx!==i){ selIdx=i; renderHand(mine); return; }
       if(!allowed){ selIdx=null; renderHand(mine); return; }
       selIdx=null;
-      c.c==='w' ? pickColor(i) : act({t:'play',i});
+      c.c!=='w' ? act({t:'play',i}) : (c.v==='custom' ? pickCustomEffect(i) : pickColor(i));
     };
   });
 
@@ -2147,6 +2297,8 @@ $('#b-hint').onclick=()=>{
   if(VIEW) renderAll();
 };
 $('#b-invite').onclick=showInviteOverlay;
+$('#hint-left').onclick=()=>$('#hand').scrollBy({left:-130,behavior:'smooth'});
+$('#hint-right').onclick=()=>$('#hand').scrollBy({left:130,behavior:'smooth'});
 addEventListener('resize',()=>{ if(!VIEW) return; if(handView==='fan') layoutFan($('#hand')); else updateScrollHints($('#hand')); });
 
 /* Il codice e la password restano visibili solo nella lobby: una volta
@@ -2175,7 +2327,9 @@ function showInviteOverlay(){
   ov.classList.add('on');
   try{ drawQR($('#ovqr'), inviteUrl(ROOM), 4); }catch(e){}
 }
-function pickColor(i){
+// ultimo passo, comune a jolly normale e carta bianca: scegliere il colore.
+// "custom" (se c'è) porta con sé l'effetto già deciso nei passi precedenti.
+function pickColor(i,custom){
   const ov=$('#ov'), p=$('#ovpanel');
   p.innerHTML='<h2>'+t('overlay.chooseColor')+'</h2><div class="colorpick"></div>';
   const g=p.querySelector('.colorpick');
@@ -2183,8 +2337,67 @@ function pickColor(i){
     const d=document.createElement('div'); d.className='cp';
     d.style.background='var(--'+c+')'; d.style.color=c==='y'?'#3b2f00':'#fff';
     d.textContent=CSHAPE[c];
-    d.onclick=()=>{ ov.classList.remove('on'); act({t:'play',i,color:c}); };
+    d.onclick=()=>{
+      ov.classList.remove('on');
+      const payload={t:'play',i,color:c};
+      if(custom){
+        const cc=Object.assign({},custom);
+        // "pesca fino al colore": il colore è lo stesso appena scelto per il
+        // tavolo, non serve chiederlo due volte
+        if(cc.effect==='drawUntilColor') cc.color=c;
+        payload.custom=cc;
+      }
+      act(payload);
+    };
     g.appendChild(d);
+  });
+  ov.classList.add('on');
+}
+// carta bianca, passo 1: che effetto vuoi.
+function pickCustomEffect(i){
+  const ov=$('#ov'), p=$('#ovpanel');
+  p.innerHTML='<h2>'+t('overlay.customTitle')+'</h2><div class="customlist"></div>';
+  const list=p.querySelector('.customlist');
+  [['drawN','custom.drawN'],['drawUntilColor','custom.drawUntilColor'],
+   ['swapHands','custom.swapHands'],['rotateHands','custom.rotateHands'],
+   ['reshuffleAll','custom.reshuffleAll']].forEach(([eff,key])=>{
+    const b=btn(t(key),()=>customStep2(i,eff),'sec');
+    b.style.cssText='width:100%;margin-top:8px';
+    list.appendChild(b);
+  });
+  ov.classList.add('on');
+}
+const otherPlayers=()=>VIEW.players.filter(x=>x.id!==VIEW.you);
+// carta bianca, passo 2: solo per gli effetti che hanno bisogno di altro
+// (un bersaglio, un verso, un numero) — chi non ne ha bisogno salta dritto
+// alla scelta del colore.
+function customStep2(i,effect){
+  const ov=$('#ov'), p=$('#ovpanel');
+  if(effect==='reshuffleAll'){ pickColor(i,{effect}); return; }
+  if(effect==='rotateHands'){
+    p.innerHTML='<h2>'+t('custom.rotateHands')+'</h2><div class="customlist"></div>';
+    const list=p.querySelector('.customlist');
+    [[1,'custom.dirRight'],[-1,'custom.dirLeft']].forEach(([dir,key])=>{
+      const b=btn(t(key),()=>pickColor(i,{effect,dir}),'sec');
+      b.style.cssText='width:100%;margin-top:8px';
+      list.appendChild(b);
+    });
+    ov.classList.add('on');
+    return;
+  }
+  let n=2;
+  p.innerHTML='<h2>'+t('overlay.chooseTarget')+'</h2>'+
+    (effect==='drawN'?'<div style="display:flex;align-items:center;gap:10px;margin-top:10px">'+
+      '<input type="range" min="1" max="8" value="2" id="cw-n" style="flex:1">'+
+      '<b id="cw-nval" style="min-width:18px">2</b></div>':'')+
+    '<div class="customlist" id="cw-targets" style="margin-top:10px"></div>';
+  if(effect==='drawN') $('#cw-n').oninput=e=>{ n=+e.target.value; $('#cw-nval').textContent=n; };
+  otherPlayers().forEach(pl=>{
+    const b=btn(esc(pl.name),()=>{
+      pickColor(i, effect==='drawN'?{effect,target:pl.id,n}:{effect,target:pl.id});
+    },'sec');
+    b.style.cssText='width:100%;margin-top:8px';
+    $('#cw-targets').appendChild(b);
   });
   ov.classList.add('on');
 }
@@ -2279,7 +2492,7 @@ $('#b-start').onclick=()=>{
   if(!ME.host||!G) return;
   const r=lobbyRules();                 // le spunte valgono da questa mano
   G.strict4=r.strict4; G.strictW=r.strictW; G.freeDraw=r.freeDraw; G.stackRule=r.stack;
-  G.handover=r.handover;
+  G.handover=r.handover; G.customWild=r.customWild;
   G.startRound(); pushAll();
 };
 $('#b-copy').onclick=async()=>{
