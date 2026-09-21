@@ -154,7 +154,7 @@ input[type=text]:focus{border-color:var(--y)}
 
 .handwrap{flex:none;padding:4px 0 8px}
 .actions{display:flex;gap:8px;justify-content:center;padding:0 10px 6px;flex-wrap:wrap;min-height:38px}
-.handtools{display:flex;gap:7px;justify-content:center;padding:0 10px 4px}
+.handtools{display:flex;gap:7px;justify-content:center;padding:0 10px 4px;flex-wrap:wrap}
 .chip{background:#ffffff12;border:1px solid #ffffff22;color:var(--dim);font-size:11px;
   padding:5px 11px;border-radius:20px;cursor:pointer;font-family:inherit}
 .chip.on{background:#e8b91f22;border-color:#e8b91f66;color:var(--y)}
@@ -363,6 +363,7 @@ html{background:radial-gradient(ellipse at 50% 20%,#0f2a1e 0%,#040f0b 70%)}
       <button class="chip" id="b-view"></button>
       <button class="chip" id="b-hint"></button>
       <button class="chip" id="b-invite" data-i18n="game.inviteBtn"></button>
+      <button class="chip" id="b-sound"></button>
     </div>
     <div class="handscroll">
       <div class="hand fan" id="hand"></div>
@@ -484,6 +485,7 @@ it:{
 'overlay.inviteHint':'Se qualcuno si è disconnesso, può rientrare con questo codice e questa password, anche a partita in corso.',
 'misc.close':'Chiudi','lobby.leaveBtn':'Lascia la stanza',
 'opt.customwild':'Includi le Carte Bianche (2 a scelta + 2 Rimescola)','card.custom':'Carta Bianca','card.shuffle':'Carta Rimescola',
+'sound.on':'♪ Suoni: sì','sound.off':'♪ Suoni: no',
 'overlay.customTitle':'Scegli l\'effetto','overlay.chooseTarget':'Scegli il giocatore',
 'custom.drawN':'Un giocatore pesca N carte','custom.drawUntilColor':'Un giocatore pesca finché non esce un colore',
 'custom.swapHands':'Scambia la mano con un giocatore','custom.rotateHands':'Ruota tutte le mani',
@@ -562,6 +564,7 @@ en:{
 'overlay.inviteHint':'If someone got disconnected, they can rejoin with this code and password, even mid-game.',
 'misc.close':'Close','lobby.leaveBtn':'Leave room',
 'opt.customwild':'Include the Wild Cards (2 pick-an-effect + 2 Shuffle)','card.custom':'Wild Card','card.shuffle':'Shuffle Card',
+'sound.on':'♪ Sound: on','sound.off':'♪ Sound: off',
 'overlay.customTitle':'Choose the effect','overlay.chooseTarget':'Choose the player',
 'custom.drawN':'A player draws N cards','custom.drawUntilColor':'A player draws until a color comes up',
 'custom.swapHands':'Swap hands with a player','custom.rotateHands':'Rotate all hands',
@@ -640,6 +643,7 @@ es:{
 'overlay.inviteHint':'Si alguien se ha desconectado, puede volver a entrar con este código y esta contraseña, incluso con la partida en curso.',
 'misc.close':'Cerrar','lobby.leaveBtn':'Salir de la sala',
 'opt.customwild':'Incluir las Cartas Blancas (2 a elegir + 2 Barajar)','card.custom':'Carta Blanca','card.shuffle':'Carta Barajar',
+'sound.on':'♪ Sonido: sí','sound.off':'♪ Sonido: no',
 'overlay.customTitle':'Elige el efecto','overlay.chooseTarget':'Elige el jugador',
 'custom.drawN':'Un jugador roba N cartas','custom.drawUntilColor':'Un jugador roba hasta que sale un color',
 'custom.swapHands':'Intercambia la mano con un jugador','custom.rotateHands':'Rota todas las manos',
@@ -718,6 +722,7 @@ fr:{
 'overlay.inviteHint':'Si quelqu\'un a été déconnecté, il peut revenir avec ce code et ce mot de passe, même en pleine partie.',
 'misc.close':'Fermer','lobby.leaveBtn':'Quitter la salle',
 'opt.customwild':'Inclure les Cartes Blanches (2 au choix + 2 Mélange)','card.custom':'Carte Blanche','card.shuffle':'Carte Mélange',
+'sound.on':'♪ Son : oui','sound.off':'♪ Son : non',
 'overlay.customTitle':'Choisis l\'effet','overlay.chooseTarget':'Choisis le joueur',
 'custom.drawN':'Un joueur pioche N cartes','custom.drawUntilColor':'Un joueur pioche jusqu\'à une couleur',
 'custom.swapHands':'Échange sa main avec un joueur','custom.rotateHands':'Fait tourner toutes les mains',
@@ -796,6 +801,7 @@ de:{
 'overlay.inviteHint':'Falls jemand die Verbindung verloren hat, kann er mit diesem Code und Passwort wieder einsteigen, auch mitten im Spiel.',
 'misc.close':'Schließen','lobby.leaveBtn':'Raum verlassen',
 'opt.customwild':'Weiße Karten einschließen (2 mit Effektwahl + 2 Mischen)','card.custom':'Weiße Karte','card.shuffle':'Misch-Karte',
+'sound.on':'♪ Ton: an','sound.off':'♪ Ton: aus',
 'overlay.customTitle':'Effekt wählen','overlay.chooseTarget':'Spieler wählen',
 'custom.drawN':'Ein Spieler zieht N Karten','custom.drawUntilColor':'Ein Spieler zieht, bis eine Farbe kommt',
 'custom.swapHands':'Tauscht die Hand mit einem Spieler','custom.rotateHands':'Dreht alle Hände weiter',
@@ -874,6 +880,7 @@ pt:{
 'overlay.inviteHint':'Se alguém ficou desconectado, pode voltar a entrar com este código e senha, mesmo a meio do jogo.',
 'misc.close':'Fechar','lobby.leaveBtn':'Sair da sala',
 'opt.customwild':'Incluir as Cartas Brancas (2 à escolha + 2 Baralhar)','card.custom':'Carta Branca','card.shuffle':'Carta Baralhar',
+'sound.on':'♪ Som: sim','sound.off':'♪ Som: não',
 'overlay.customTitle':'Escolhe o efeito','overlay.chooseTarget':'Escolhe o jogador',
 'custom.drawN':'Um jogador compra N cartas','custom.drawUntilColor':'Um jogador compra até sair uma cor',
 'custom.swapHands':'Troca a mão com um jogador','custom.rotateHands':'Roda todas as mãos',
@@ -933,6 +940,7 @@ function setLang(l){
   if(VIEW){ VIEW.phase==='lobby'?renderLobby():renderAll(); }
   else if(G){ renderLobby(); }
   if(NET) status();
+  updateSoundBtn();
 }
 function initLangSel(){
   const sel=$('#langsel'); sel.innerHTML='';
@@ -2009,6 +2017,12 @@ function setGuestHandlers(){
   };
 }
 function act(o){
+  // feedback immediato e locale: non aspetta la conferma dell'host, così
+  // si sente scattare al tocco anche quando la rete è un po' lenta
+  if(o.t==='play') sfx('play');
+  else if(o.t==='draw') sfx('draw');
+  else if(o.t==='one') sfx('one');
+  else if(o.t==='catch') sfx('caught');
   if(ME.host) NET.ondata(ME.id,o);
   else{ const h=[...NET.links.keys()][0]; if(h) NET.send(h,o); else toast('err.notConnected'); }
 }
@@ -2069,7 +2083,7 @@ function renderLobby(){
     : t('lobby.hintWaitHost');
 }
 const setText=(sel,t)=>{ const e=$(sel); if(e.textContent!==t) e.textContent=t; };
-let lastTop=null, lastOpp=[], lastActions=null, lastScores=null;
+let lastTop=null, lastOpp=[], lastActions=null, lastScores=null, wasMyTurn=false;
 
 /* Un riquadro giocatore si ricostruisce solo se qualcosa nel suo contenuto
    è cambiato: altrimenti il mazzetto a ventaglio verrebbe ridisegnato a ogni
@@ -2130,6 +2144,10 @@ function renderAll(){
   setText('#log',renderMsg(VIEW.log));
 
   const mine = VIEW.turn===VIEW.you && VIEW.phase==='play';
+  // un suono solo quando il turno DIVENTA tuo, non ad ogni aggiornamento
+  // dello stato (altrimenti suonerebbe anche per un semplice keepalive)
+  if(mine&&!wasMyTurn) sfx('turn');
+  wasMyTurn=mine;
   setText('#mystatus', !mine ? ''
     : (VIEW.pending!==null ? t('game.playDrawnOrPass')
     : VIEW.stack>0 ? t('game.respondOrDraw',{type:VIEW.stackType,n:VIEW.stack})
@@ -2162,6 +2180,36 @@ const VIEWS=['fan','fila','griglia'];
 let handView=recall('uct_view')||'fan';
 let hints=recall('uct_hints')!=='0';
 let selIdx=null;
+
+/* --------------------------------------------------------------------- SFX
+   Toni sintetizzati al volo (Web Audio), niente file da caricare: restiamo
+   un solo file. La vibrazione dove il browser la offre. Tutto locale e
+   silenziabile — non viaggia in rete, ognuno sente/sente solo il proprio.  */
+let soundOn=recall('uct_sound')!=='0';
+let audioCtx=null;
+function beep(freq,dur,type,vol){
+  if(!soundOn) return;
+  try{
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type||'sine'; o.frequency.value=freq;
+    g.gain.value=vol||.12;
+    g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+function buzz(ms){ if(soundOn&&navigator.vibrate) try{ navigator.vibrate(ms); }catch(e){} }
+function sfx(name){
+  if(!soundOn) return;
+  if(name==='turn'){ buzz(60); beep(660,.12); setTimeout(()=>beep(880,.16),110); }
+  else if(name==='play'){ beep(420,.07,'triangle',.09); }
+  else if(name==='draw'){ buzz(15); beep(300,.06,'square',.06); }
+  else if(name==='one'){ buzz([40,40,40]); beep(1000,.08); setTimeout(()=>beep(1000,.08),110); setTimeout(()=>beep(1000,.13),220); }
+  else if(name==='caught'){ buzz(120); beep(180,.25,'sawtooth',.1); }
+  else if(name==='win'){ [660,880,990,1320].forEach((f,i)=>setTimeout(()=>beep(f,.16),i*110)); }
+}
 
 // specchio di Game.whyNot: stesse condizioni, altrimenti si accendono carte
 // che poi l'host rifiuta
@@ -2311,6 +2359,16 @@ $('#b-hint').onclick=()=>{
   if(VIEW) renderAll();
 };
 $('#b-invite').onclick=showInviteOverlay;
+function updateSoundBtn(){
+  $('#b-sound').textContent=t(soundOn?'sound.on':'sound.off');
+  $('#b-sound').classList.toggle('on',soundOn);
+}
+$('#b-sound').onclick=()=>{
+  soundOn=!soundOn; keep('uct_sound',soundOn?'1':'0');
+  updateSoundBtn();
+  if(soundOn) beep(660,.1);           // conferma udibile di aver riacceso
+};
+updateSoundBtn();
 $('#hint-left').onclick=()=>$('#hand').scrollBy({left:-130,behavior:'smooth'});
 $('#hint-right').onclick=()=>$('#hand').scrollBy({left:130,behavior:'smooth'});
 addEventListener('resize',()=>{ if(!VIEW) return; if(handView==='fan') layoutFan($('#hand')); else updateScrollHints($('#hand')); });
@@ -2421,6 +2479,7 @@ function showScores(){
   const sig=[VIEW.phase,VIEW.lastWinner,VIEW.players.map(x=>x.id+':'+x.score).join(','),LANG].join('|');
   if(sig===lastScores){ ov.classList.add('on'); return; }
   lastScores=sig;
+  sfx('win');
   const w=VIEW.players.find(x=>x.id===VIEW.lastWinner);
   p.innerHTML='<h2>'+(over?t('overlay.gameOver'):t('overlay.roundEnd'))+'</h2>'+
     '<div class="muted" style="margin:0 auto">'+(w?t(over?'overlay.winnerGame':'overlay.winnerRound',{name:esc(w.name)}):'')+'</div>'+
