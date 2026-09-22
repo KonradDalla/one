@@ -134,18 +134,24 @@ input[type=text]:focus{border-color:var(--y)}
 /* la dimensione segue --card-w (non un font-size fisso): resta proporzionata
    alla LARGHEZZA della carta in ogni vista e ad ogni breakpoint, senza una
    regola a parte per ciascuna. Più opaco di prima: sul rosso spariva.      */
+/* più grande e "incisa": due ombre, una chiara verso l'alto-sinistra e una
+   scura verso il basso-destra, danno l'idea di un rilievo stampato nella
+   carta invece di una semplice macchia semitrasparente.                   */
 .card .cwatermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:calc(var(--card-w) * .85);opacity:.24;color:#fff;pointer-events:none}
+  font-size:calc(var(--card-w) * 1.05);opacity:.3;color:#fff;pointer-events:none;
+  text-shadow:-1px -1px 0 rgba(255,255,255,.3),1px 2px 1px rgba(0,0,0,.4)}
 /* nella griglia le carte sono piccole ma il simbolo per i daltonici deve
    restare: prima spariva del tutto proprio lì, sulle carte in mano.        */
 .hand.griglia .card .cshape{top:2px;right:3px;font-size:8px}
 .card.r{background:var(--r)} .card.g{background:var(--g)}
-.card.b{background:var(--b)} .card.y{background:var(--y);color:#3b2f00}
+.card.b{background:var(--b)} .card.y{background:var(--y)}
 .card.w{background:conic-gradient(var(--r) 0 25%,var(--b) 0 50%,var(--y) 0 75%,var(--g) 0)}
 /* le due bianche vere: sfondo chiaro, non arcobaleno, altrimenti si perdono
-   in mezzo a Cambia Colore e Pesca Quattro a colpo d'occhio.               */
-.card.w.blank{background:#fff;color:#241d00}
-.card.w.blank .cnr{opacity:.75}
+   in mezzo a Cambia Colore e Pesca Quattro a colpo d'occhio. Il testo resta
+   bianco come su tutte le altre carte: è il bordino nero a farlo leggere
+   anche sul bianco, non un colore di testo diverso caso per caso.         */
+.card.w.blank{background:#fff}
+.card.w.blank .cnr{opacity:.85}
 .card.back{background:repeating-linear-gradient(45deg,#1b1b24,#1b1b24 6px,#262633 6px,#262633 12px)}
 .card.back::after{content:"1";font-size:27px;font-weight:900;color:#fff9;transform:rotate(-12deg)}
 .deckwrap{position:relative;cursor:pointer}
@@ -195,18 +201,14 @@ input[type=text]:focus{border-color:var(--y)}
   transform-origin:50% 115%;transition:transform .2s cubic-bezier(.2,.8,.3,1),box-shadow .2s;
   box-shadow:-3px 4px 10px #0006}
 .hand.fan .card.sel{box-shadow:0 10px 26px #000a;z-index:99!important}
-/* anello + bagliore ben visibili sopra qualunque sfondo di carta: prima era
-   un filo di 2px, quasi invisibile sulle carte gialle e sul feltro scuro.
-   Vale in tutte e tre le viste, non solo nel ventaglio. Il raggio del
-   bagliore è pensato apposta per stare dentro il padding di fila/griglia:
-   più largo verrebbe tagliato dal loro overflow.                          */
-/* Il raggio non è un numero a caso: è quello della carta più l'inset, così
-   l'anello resta concentrico invece di sembrare un rettangolo incollato
-   sopra — succedeva con un valore fisso, che non seguiva --card-radius
-   quando cambia (griglia, o le misure più grandi da desktop).             */
-.hand .card.ok::after{content:"";position:absolute;inset:-3px;
-  border-radius:calc(var(--card-radius) + 3px);
-  box-shadow:0 0 0 3px var(--y),0 0 9px 2px #e8b91f99;pointer-events:none}
+/* anello + bagliore ben visibili sopra qualunque sfondo di carta. Un tempo
+   era un ::after con inset e border-radius calcolato a mano: sulla carta
+   vera il raggio non tornava mai perfettamente concentrico coi suoi angoli
+   (approssimazione di box-shadow sugli spread, diversa da motore a motore).
+   outline segue SEMPRE il border-radius reale dell'elemento — nessun calcolo
+   da sbagliare — e drop-shadow segue la sagoma resa, non un box a parte.   */
+.hand .card.ok{outline:3px solid var(--y);outline-offset:3px;
+  filter:drop-shadow(0 0 6px #e8b91fcc)}
 
 /* frecce che indicano altre carte fuori schermo, nella fila orizzontale:
    senza, si scorre "alla cieca" e si finisce per passare senza accorgersi
@@ -231,7 +233,7 @@ input[type=text]:focus{border-color:var(--y)}
 
 /* suggerimenti spenti: nessuna carta viene evidenziata */
 .hand.noaiuti .card.no{opacity:1}
-.hand.noaiuti .card.ok::after{display:none}
+.hand.noaiuti .card.ok{outline:none;filter:none}
 .hand.fila.noaiuti .card.ok,.hand.griglia.noaiuti .card.ok{transform:none}
 .mystatus{text-align:center;font-size:13px;font-weight:700;height:18px;color:var(--y)}
 
