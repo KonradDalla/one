@@ -125,8 +125,10 @@ input[type=text]:focus{border-color:var(--y)}
   font-weight:900;color:#fff;box-shadow:0 5px 14px #0007;border:3px solid #fff;user-select:none}
 /* più vicino alle carte vere: il numero domina la carta, leggermente
    inclinato, non un numeretto in mezzo a tanto spazio vuoto.               */
-.card .big{font-size:40px;font-style:italic;text-shadow:0 2px 0 #0003}
-.card .cnr{position:absolute;font-size:11px;opacity:.92}
+.card .big{font-size:40px;font-style:italic;text-shadow:0 2px 0 #0003;
+  -webkit-text-stroke:1.4px #000;paint-order:stroke fill}
+.card .cnr{position:absolute;font-size:11px;opacity:.92;
+  -webkit-text-stroke:.6px #000;paint-order:stroke fill}
 .card .cnr.tl{top:3px;left:5px} .card .cnr.br{bottom:3px;right:5px;transform:rotate(180deg)}
 .card .cshape{position:absolute;top:4px;right:6px;font-size:10px;opacity:.85;text-shadow:0 1px 0 #0004}
 /* la dimensione segue --card-w (non un font-size fisso): resta proporzionata
